@@ -1,0 +1,56 @@
+/* 基礎重置 */
+@layer base {
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #020617;
+    color: white;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* --- 手動補丁：確保在 Tailwind 未完全啟動時佈局依然正確 --- */
+
+/* 棋盤核心佈局 */
+.grid { display: grid !important; }
+.flex { display: flex !important; }
+
+/* 7x7 網格強制修正 */
+.grid-cols-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+.grid-rows-7 {
+  grid-template-rows: repeat(7, minmax(0, 1fr)) !important;
+}
+
+/* 中心區域位置強制修正 */
+.col-start-2 { grid-column-start: 2 !important; }
+.col-end-7 { grid-column-end: 7 !important; }
+.row-start-2 { grid-row-start: 2 !important; }
+.row-end-7 { grid-row-end: 7 !important; }
+
+/* 顏色修復 */
+.bg-slate-900 { background-color: #0f172a !important; }
+.bg-slate-950 { background-color: #020617 !important; }
+.bg-amber-500 { background-color: #f59e0b !important; }
+.bg-indigo-600 { background-color: #4f46e5 !important; }
+.bg-red-900 { background-color: #7f1d1d !important; }
+.bg-emerald-600 { background-color: #059669 !important; }
+
+/* 比例與圓角 */
+.aspect-square { aspect-ratio: 1 / 1 !important; }
+.rounded-3xl { border-radius: 1.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+.border { border: 1px solid #1e293b !important; }
+
+/* 文字樣式 */
+.text-amber-400 { color: #fbbf24 !important; }
+.text-slate-100 { color: #f1f5f9 !important; }
+.text-slate-500 { color: #64748b !important; }
+
+/* 載入標準 Tailwind 指令 (如果編譯器抓得到的話) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
