@@ -1,70 +1,18 @@
-# Getting Started with Create React App
+# 🎮 課金帝國：The IAP Empire
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**盡情課金，成為王者，建立起屬於自己的帝國！！** 💰🐋
 
-## Available Scripts
+在《課金帝國》裡，沒有課金就沒有未來！  
+盡情課金、解鎖超實用道具、建造屬於你的課金帝國，一路從平民社畜課到成為王者！
 
-In the project directory, you can run:
+- 超上癮的點擊進度系統 + 多人策略競技棋類遊戲  
+- 各種荒謔又真實的 IAP 課金道具  
+- 專屬給「鯨魚玩家」的終極爽感  
+- 一邊嘲笑課金，一邊快樂地課金！
 
-### `npm start`
+**警告：** 本遊戲極度容易讓人衝動消費（虛擬貨幣）。  
+理性遊玩… 課金把他人踩在腳下！課金使你秒變王者！
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+準備好成為課金界的帝王了嗎？  
+盡情課金，建立你的帝國吧！！ 🏰✨
+[👉 立即點擊進入課金帝國 👈]([你的GitHubPages網址](https://greycrow2019.github.io/the-iap-empire/))
