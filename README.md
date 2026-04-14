@@ -15,4 +15,6 @@
 
 準備好成為課金界的帝王了嗎？  
 盡情課金，建立你的帝國吧！！ 🏰✨
-[👉 立即點擊進入課金帝國 👈]([https://greycrow2019.github.io/the-iap-empire/)
+
+[👉 立即點擊進入課金帝國 👈]
+([https://greycrow2019.github.io/the-iap-empire/)
