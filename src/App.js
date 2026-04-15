@@ -24,7 +24,7 @@ const BOARD_CELLS = [
   // Right Side
   { id: 10, type: 'work', name: '工作日1', cost: 5, col: 7, row: 2 },
   { id: 11, type: 'work', name: '工作日2', cost: 4, col: 7, row: 3 },
-  { id: 12, type: 'work', name: '工作日3', cost: 7, row: 4 }, // 原機制邏輯不變
+  { id: 12, type: 'work', name: '工作日3', cost: 3, col: 7, row: 4 },
   { id: 13, type: 'work', name: '工作日4', cost: 2, col: 7, row: 5 },
   { id: 14, type: 'work', name: '工作日5', cost: 1, col: 7, row: 6 },
   
@@ -323,7 +323,7 @@ export default function App() {
     lap: 0, 
     isFinished: false, 
     stamina: 100, 
-    wealth: 1000, 
+    wealth: 3000, 
     stress: 0, 
     spirit: 80, 
     belief: 30,
@@ -524,7 +524,7 @@ const handleBuyItem = useCallback(
 
         if (itemToUse.target === 'first_work1') {
           p.lap += 1;
-          p.wealth = clamp(p.wealth + 500, 0, 10000);
+          p.wealth = clamp(p.wealth + 1000, 0, 10000);
           if (p.longInvestmentBonus > 0) {
             p.wealth = clamp(
               p.wealth + p.longInvestmentBonus,
@@ -533,7 +533,7 @@ const handleBuyItem = useCallback(
             );
           }
           addLog(
-            `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $500${
+            `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $1000${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ''
@@ -541,7 +541,7 @@ const handleBuyItem = useCallback(
           );
         } else if (itemToUse.target === 'holiday1' && fromPos !== 0) {
           p.lap += 1;
-          p.wealth = clamp(p.wealth + 500, 0, 10000);
+          p.wealth = clamp(p.wealth + 1000, 0, 10000);
           if (p.longInvestmentBonus > 0) {
             p.wealth = clamp(
               p.wealth + p.longInvestmentBonus,
@@ -550,7 +550,7 @@ const handleBuyItem = useCallback(
             );
           }
           addLog(
-            `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $500${
+            `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $1000${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ''
@@ -786,53 +786,54 @@ const handleApplyTargetEffect = useCallback(
   [turnIndex, setPlayers, setShowTargetSelector, setPendingRecovery, addLog]
 );
 
-const triggerSocialSubsidy = useCallback(
-  (reason = '財力不足') => {
-    const currentIdx = turnIndex;
-    addLog(`🚨 ${players[currentIdx].name} ${reason}，強制遣返獲得救濟 $500。`);
-    let madKingJustUnlocked = null;
+const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
+  const currentIdx = turnIndex;
+  addLog(`🚨 ${players[currentIdx].name} ${reason}，強制遣返獲得救濟 $500。`);
 
-    setPlayers(prev => {
-      const next = [...prev];
-      const p = { ...next[currentIdx] };
-      p.pos = 0;
-      p.lap += 1;
-      p.wealth = clamp(p.wealth + 500, 0, 10000);
-      p.hasLandedOnHoliday = true;
+  let madKingJustUnlocked = null;  // ★ 新增：用來記錄剛解鎖的玩家名
 
-      p.socialSubsidyCount = (p.socialSubsidyCount || 0) + 1;
+  setPlayers(prev => {
+    const next = [...prev];
+    const p = { ...next[currentIdx] };
 
-      if (!p.hasUnlockedMadKing && p.socialSubsidyCount >= 3 && p.hasUsedWeed) {
-        p.hasUnlockedMadKing = true;
-        p.hiddenGoals = [...(p.hiddenGoals || []), '瘋王'];
-        addLog(
-          `🧠 ${p.name} 觸發隱藏目標【瘋王】：已多次依賴社會補貼，若之後在解鎖後累積服用大麻 10 次，即可成就瘋王！`
-        );
-        madKingJustUnlocked = p.name;
-      }
+    p.pos = 0;
+    p.lap += 1;
+    p.wealth = clamp(p.wealth + 500, 0, 10000);
+    p.hasLandedOnHoliday = true;
 
-      if (p.lap >= MAX_LAPS) p.isFinished = true;
-      next[currentIdx] = p;
-      return next;
-    });
+    p.socialSubsidyCount = (p.socialSubsidyCount || 0) + 1;
 
-    if (madKingJustUnlocked) {
-      setHiddenGoalPopup({
-        playerName: madKingJustUnlocked,
-        goalTitle: '瘋王',
-        message: '已觸發隱藏目標【瘋王】：之後若服用大麻達 10 次，將達成瘋王結局。',
-      });
+    if (!p.hasUnlockedMadKing && p.socialSubsidyCount >= 3 && p.hasUsedWeed) {
+      p.hasUnlockedMadKing = true;
+      p.hiddenGoals = [...(p.hiddenGoals || []), '瘋王'];
+      addLog(
+        `🧠 ${p.name} 觸發隱藏目標【瘋王】：已多次依賴社會補貼，若之後在解鎖後累積服用大麻 10 次，即可成就瘋王！`
+      );
+      madKingJustUnlocked = p.name;  // ★ 標記
     }
 
-    setIsMoving(false);
-    setPendingRecovery({
-      playerIndex: currentIdx,
-      source: 'subsidy',
-      ts: Date.now(),
+    if (p.lap >= MAX_LAPS) p.isFinished = true;
+    next[currentIdx] = p;
+    return next;
+  });
+
+  // ★ 在 setPlayers 之後，如果本次有解鎖瘋王，就顯示彈窗
+  if (madKingJustUnlocked) {
+    setHiddenGoalPopup({
+      playerName: madKingJustUnlocked,
+      goalTitle: '瘋王',
+      message:
+        '已觸發隱藏目標【瘋王】：之後若服用大麻達 10 次，將達成瘋王結局。',
     });
-  },
-  [turnIndex, players, setPlayers, addLog, setHiddenGoalPopup, setIsMoving, setPendingRecovery]
-);
+  }
+
+  setIsMoving(false);
+  setPendingRecovery({
+    playerIndex: currentIdx,
+    source: 'subsidy',
+    ts: Date.now(),
+  });
+}, [turnIndex, players, setPlayers, addLog, setIsMoving, setPendingRecovery, setHiddenGoalPopup]);
 
   const handleMove = useCallback(async (steps) => {
   const s = parseInt(steps, 10);
@@ -944,11 +945,11 @@ const triggerSocialSubsidy = useCallback(
     // 跨越起點 → +1圈 +500 (+長線投資)
 if (prevPos !== 0 && nextPos === 0) {
   tempPlayer.lap += 1;
-  tempPlayer.wealth = clamp(tempPlayer.wealth + 500, 0, 10000);
+  tempPlayer.wealth = clamp(tempPlayer.wealth + 1000, 0, 10000);
   if (tempPlayer.longInvestmentBonus > 0) {
     tempPlayer.wealth = clamp(tempPlayer.wealth + tempPlayer.longInvestmentBonus, 0, 10000);
   }
-  addLog(`💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $500${tempPlayer.longInvestmentBonus > 0 ? `（長線投資 +${tempPlayer.longInvestmentBonus}）` : ''}`);
+  addLog(`💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $1000${tempPlayer.longInvestmentBonus > 0 ? `（長線投資 +${tempPlayer.longInvestmentBonus}）` : ''}`);
   if (tempPlayer.lap >= MAX_LAPS) tempPlayer.isFinished = true;
 }
 
@@ -1975,8 +1976,8 @@ function SetupScreen({ onProceed }) {
       `}} />
       <div className="bg-slate-700 p-8 rounded-3xl border border-slate-500 shadow-[0_0_50px_rgba(0,0,0,0.8)] w-[650px] text-center relative overflow-hidden flex flex-col max-h-full">
         <div className="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
-        <h1 className="text-4xl font-black mb-2 text-slate-100 tracking-tighter mt-2">課金帝國</h1>
-        <p className="text-[10px] font-black text-slate-500 mb-6 tracking-[0.4em] uppercase">The IAP Empire</p>
+        <h1 className="text-5xl font-black mb-2 text-yellow-300 tracking-tighter mt-2 drop-shadow-[0_0_18px_rgba(252,211,77,0.75)]">課金帝國</h1>
+        <p className="text-sm tracking-[0.35em] uppercase text-yellow-200 mb-6 text-center">THE IAP EMPIRE</p>
 
         <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 mb-6 text-left overflow-y-auto custom-scrollbar flex-1 max-h-[45vh]">
           <h3 className="text-blue-400 font-black text-sm mb-3 tracking-widest border-b border-slate-800 pb-2">📜 遊戲玩法與規則</h3>
