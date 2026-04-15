@@ -202,7 +202,7 @@ const ITEM_DATA = [
     id: 'reportall',
     title: '<報串>',
     price: 3000,
-    desc: '全面威脅舉報所有人：其他所有玩家財力 -500；特定玩家則再額外 -1500。',
+    desc: '全面威脅舉報所有人：其他所有玩家財力 -500；特定玩家則再額外 -1500，然後全部轉移到自己身上。',
     imageUrl: process.env.PUBLIC_URL + '/picture/reportall.png',
     requiresTarget: false,
   },
@@ -696,42 +696,54 @@ const handleBuyItem = useCallback(
     }
 
     // reportall
-    if (itemToUse.id === 'reportall') {
-      setPlayers(prev => {
-        const next = prev.map((p, idx) => {
-          const np = { ...p };
-          if (idx !== playerIdx) {
-            np.wealth = clamp(np.wealth - 500, 0, 10000);
-            if (np.hasUnlockedMadKing || np.hasUnlockedCultGod) {
-              np.wealth = clamp(np.wealth - 1500, 0, 10000);
-            }
-          }
-          return np;
-        });
+if (itemToUse.id === 'reportall') {
+  setPlayers(prev => {
+    let stolenTotal = 0;
 
-        const self = { ...next[playerIdx] };
-        self.items = self.items.filter((_, i) => i !== itemIdx);
-        next[playerIdx] = self;
-        return next;
-      });
+    const next = prev.map((p, idx) => {
+      const np = { ...p };
+      if (idx !== playerIdx) {
+        // 基本 -500
+        let delta = 500;
 
-      addLog(
-        `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，特定玩家則再額外 -1500！`
-      );
+        // 已解鎖瘋王或邪教上帝者再額外 -1500
+        if (np.hasUnlockedMadKing || np.hasUnlockedCultGod) {
+          delta += 1500;
+        }
 
-      setShowItemEffect(itemToUse);
-      setShowInventory(null);
+        // 實際能扣多少（不能低於 0）
+        const actualDeduct = Math.min(delta, np.wealth);
+        np.wealth = clamp(np.wealth - actualDeduct, 0, 10000);
 
-      setTimeout(() => {
-        setPendingRecovery({
-          playerIndex: turnIndex,
-          source: 'item',
-          ts: Date.now(),
-        });
-      }, 400);
+        // 累計被扣金額，稍後加到施放者身上
+        stolenTotal += actualDeduct;
+      }
+      return np;
+    });
 
-      return;
+    const self = { ...next[playerIdx] };
+    // 移除自己手上的「報串」
+    self.items = self.items.filter((_, i) => i !== itemIdx);
+    // 把偷到的總額加到自己財力
+    if (stolenTotal > 0) {
+      self.wealth = clamp(self.wealth + stolenTotal, 0, 10000);
     }
+
+    next[playerIdx] = self;
+    return next;
+  });
+
+  addLog(
+    `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，特定玩家則再額外 -1500，全部轉移到自己身上！`
+  );
+  setShowItemEffect(itemToUse);
+  setShowInventory(null);
+  setTimeout(
+    () => setPendingRecovery({ playerIndex: turnIndex, source: 'item', ts: Date.now() }),
+    400
+  );
+  return;
+}
   },
   [
     players,
