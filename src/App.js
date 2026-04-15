@@ -115,7 +115,7 @@ const ITEM_DATA = [
     title: '<連續通宵趕project>',
     price: 500,
     desc: '使用後直接移至下一個工作日5。',
-    imageUrl: '/picture/overtime.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/overtime.png',
     target: 'next_work5'
   },
   {
@@ -123,7 +123,7 @@ const ITEM_DATA = [
     title: '<公司是我家>',
     price: 1000,
     desc: '使用後直接傳送至第一個工作日1，並強制視為經過起點。若已在此位置則無法使用。',
-    imageUrl: '/picture/companyhome.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/companyhome.png',
     target: 'first_work1'
   },
   {
@@ -131,7 +131,7 @@ const ITEM_DATA = [
     title: '<短trip旅行>',
     price: 500,
     desc: '使用後直接移至下一個假日格。',
-    imageUrl: '/picture/shorttrip.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/shorttrip.png',
     target: 'next_holiday'
   },
   {
@@ -139,16 +139,15 @@ const ITEM_DATA = [
     title: '<長假享受人生>',
     price: 1000,
     desc: '使用後直接傳送至假日1。若已在此位置則無法使用。',
-    imageUrl: '/picture/longholiday.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/longholiday.png',
     target: 'holiday1'
   },
-  // 新增四款道具（會在後面實作效果）
   {
     id: 'workunload',
     title: '<職場卸膊>',
     price: 1500,
     desc: '自身壓力減少 50，對象玩家體力減少 30。',
-    imageUrl: '/picture/workunload.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/workunload.png',
     requiresTarget: true
   },
   {
@@ -156,7 +155,7 @@ const ITEM_DATA = [
     title: '<借錢不還>',
     price: 1500,
     desc: '自己財力 +1500，對象玩家財力 -1500。',
-    imageUrl: '/picture/borrownotreturn.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/borrownotreturn.png',
     requiresTarget: true
   },
   {
@@ -164,7 +163,7 @@ const ITEM_DATA = [
     title: '<掉哪媽，頂硬上！>',
     price: 1500,
     desc: '自己體力 +100、壓力 +50、信念 +10、精神+80。',
-    imageUrl: '/picture/toughitout.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/toughitout.png',
     requiresTarget: false
   },
   {
@@ -172,7 +171,7 @@ const ITEM_DATA = [
     title: '<長線投資>',
     price: 1000,
     desc: '每次增加1圈數時，額外獲得 +300 財力（永久效果）。',
-    imageUrl: '/picture/longinvestment.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/longinvestment.png',
     requiresTarget: false
   },
   {
@@ -180,7 +179,7 @@ const ITEM_DATA = [
     title: '<公司10%股份>',
     price: 2000,
     desc: '公司10%股份，每張使用(等同賣出)後可立即獲得 +2000 財力。',
-    imageUrl: '/picture/companyshare.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/companyshare.png',
     requiresTarget: false
   },
   {
@@ -188,7 +187,7 @@ const ITEM_DATA = [
     title: '<大麻>',
     price: 1000,
     desc: '使用後壓力 -100（最低0）。',
-    imageUrl: '/picture/weed.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/weed.png',
     requiresTarget: false
   },
   {
@@ -196,7 +195,7 @@ const ITEM_DATA = [
     title: '<奉獻>',
     price: 1000,
     desc: '使用後信念 +10（最高100），向宗教組織奉獻後心靈踏實。',
-    imageUrl: '/picture/donation.png',
+    imageUrl: process.env.PUBLIC_URL + '/picture/donation.png',
     requiresTarget: false
   },
   {
@@ -204,8 +203,8 @@ const ITEM_DATA = [
     title: '<報串>',
     price: 3000,
     desc: '全面威脅舉報所有人：其他所有玩家財力 -500；特定玩家則再額外 -1500。',
-    imageUrl: '/picture/reportall.png',  
-    requiresTarget: false,               
+    imageUrl: process.env.PUBLIC_URL + '/picture/reportall.png',
+    requiresTarget: false,
   },
 ];
 
@@ -2053,19 +2052,19 @@ function NamingScreen({ players, setPlayers, onFinalize }) {
 function GameOverScreen({ players }) {
   const winner = players.find(p => p.victoryTitle);
 
-  // 依不同成就選擇圖片（路徑可之後自行更改）
-  const victoryImage =
-    winner?.victoryTitle === "King of Leisure"
-      ? "/picture/kingofleisure.png"        // TODO: 改成你實際的 Leisure 圖片
-      : winner?.victoryTitle === "打工皇帝"
-      ? "/picture/kingofwork.png"           // TODO: 改成你實際的 打工皇帝 圖片
-      : winner?.victoryTitle === "山大王"
-      ? "/picture/kingofcompany.png"         // TODO: 預留 山大王 圖片路徑
-      : winner?.victoryTitle === "瘋王"
-      ? "/picture/madking.png"              // TODO: 預留 瘋王 圖片路徑
-      : winner?.victoryTitle === "邪教上帝"
-      ? "/picture/cultgod.png"              // TODO: 預留 邪教上帝 圖片路徑
-      : null;
+  // 依不同成就選擇圖片（放在 public/picture 底下）
+const victoryImage =
+  winner?.victoryTitle === "King of Leisure"
+    ? process.env.PUBLIC_URL + "/picture/kingofleisure.png"
+    : winner?.victoryTitle === "打工皇帝"
+    ? process.env.PUBLIC_URL + "/picture/kingofwork.png"
+    : winner?.victoryTitle === "山大王"
+    ? process.env.PUBLIC_URL + "/picture/kingofcompany.png"
+    : winner?.victoryTitle === "瘋王"
+    ? process.env.PUBLIC_URL + "/picture/madking.png"
+    : winner?.victoryTitle === "邪教上帝"
+    ? process.env.PUBLIC_URL + "/picture/cultgod.png"
+    : null;
 
   // 不同成就專屬祝賀訊息
   const congratsMessage =
