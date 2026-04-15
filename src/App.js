@@ -716,7 +716,7 @@ const handleBuyItem = useCallback(
       });
 
       addLog(
-        `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，已解鎖瘋王或邪教上帝者再額外 -1500！`
+        `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，特定玩家則再額外 -1500！`
       );
 
       setShowItemEffect(itemToUse);
