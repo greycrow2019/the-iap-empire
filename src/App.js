@@ -101,11 +101,11 @@ const HOLIDAY_POSITIVE_EVENTS = [
 const HOLIDAY_NEGATIVE_EVENTS = [
   { id: 'h1', title: "家人要求大掃除", desc: "本想睡懶覺，結果被拉起來大掃除一整天。", effect: { stamina: -10, stress: 5, spirit: -6 } },
   { id: 'h3', title: "去看熱門電影", desc: "買票、爆米花、飲料，享受大銀幕時光。", effect: { spirit: 10, stress: -8, wealth: -90 } },
-  { id: 'h5', title: "家庭大聚餐", desc: "全家人聚餐，你被推出來負責買單。", effect: { wealth: -220, spirit: 9, belief: -5 } },
-  { id: 'h7', title: "假日網購衝動消費", desc: "滑手機不小心買了一堆東西。", effect: { wealth: -160, spirit: 6, stress: 4 } },
+  { id: 'h5', title: "家庭大聚餐", desc: "全家人聚餐，你被推出來負責買單。", effect: { wealth: -380, spirit: 10, belief: -5 } },
+  { id: 'h7', title: "假日網購衝動消費", desc: "滑手機不小心買了一堆東西。", effect: { wealth: -320, spirit: 7, stress: 4, belief: -4 } },
   { id: 'h10', title: "登山健行扭傷", desc: "去爬山欣賞風景，不小心扭到腳。", effect: { stamina: -13, spirit: -5 } },
-  { id: 'h15', title: "寵物突然生病", desc: "假日帶寵物看獸醫，花了不少錢。", effect: { wealth: -190, stress: 9, spirit: -8 } },
-  { id: 'h18', title: "衝動辦健身房年卡", desc: "看到促銷，一時衝動辦了昂貴年卡。", effect: { wealth: -230, stress: 5 } }
+  { id: 'h15', title: "寵物突然生病", desc: "假日帶寵物看獸醫，花了不少錢。", effect: { wealth: -420, stress: 8, spirit: -10, belief: -6 } },
+  { id: 'h18', title: "衝動辦健身房年卡", desc: "看到促銷，一時衝動辦了昂貴年卡。", effect: { wealth: -480, stress: 5, belief: -6 } }
 ];
 
 // ==================== 道具卡資料（新增四種道具） ====================
@@ -163,7 +163,7 @@ const ITEM_DATA = [
     id: 'toughitout',
     title: '<掉哪媽，頂硬上！>',
     price: 1500,
-    desc: '自己體力 +100、壓力 +50、信念 +10。',
+    desc: '自己體力 +100、壓力 +50、信念 +10、精神+80。',
     imageUrl: '/picture/toughitout.png',
     requiresTarget: false
   },
@@ -578,8 +578,10 @@ const handleBuyItem = useCallback(
         p.stamina = clamp(p.stamina + 100, 0, 100);
         p.stress = clamp(p.stress + 50, 0, 100);
         p.belief = clamp(p.belief + 10, 0, 100);
+        p.spirit = clamp(p.spirit + 80, 0, 100);
+
         addLog(
-          `💪 ${p.name} 使用「掉哪媽，頂硬上！」：體力+100、壓力+50、信念+10`
+          `💪 ${p.name} 使用「掉哪媽，頂硬上！」：體力+100、壓力+50、信念+10、精神+80`
         );
         next[playerIdx] = p;
         return next;
