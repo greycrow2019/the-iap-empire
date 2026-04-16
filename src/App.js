@@ -113,7 +113,7 @@ const ITEM_DATA = [
   {
     id: 'overtime',
     title: '<連續通宵趕project>',
-    price: 500,
+    price: 1000,
     desc: '使用後直接移至下一個工作日5。',
     imageUrl: process.env.PUBLIC_URL + '/picture/overtime.png',
     target: 'next_work5'
@@ -121,7 +121,7 @@ const ITEM_DATA = [
   {
     id: 'companyhome',
     title: '<公司是我家>',
-    price: 1000,
+    price: 2000,
     desc: '使用後直接傳送至第一個工作日1，並強制視為經過起點。若已在此位置則無法使用。',
     imageUrl: process.env.PUBLIC_URL + '/picture/companyhome.png',
     target: 'first_work1'
@@ -129,7 +129,7 @@ const ITEM_DATA = [
   {
     id: 'shorttrip',
     title: '<短trip旅行>',
-    price: 500,
+    price: 1000,
     desc: '使用後直接移至下一個假日格。',
     imageUrl: process.env.PUBLIC_URL + '/picture/shorttrip.png',
     target: 'next_holiday'
@@ -137,7 +137,7 @@ const ITEM_DATA = [
   {
     id: 'longholiday',
     title: '<長假享受人生>',
-    price: 1000,
+    price: 2000,
     desc: '使用後直接傳送至假日1。若已在此位置則無法使用。',
     imageUrl: process.env.PUBLIC_URL + '/picture/longholiday.png',
     target: 'holiday1'
@@ -322,7 +322,7 @@ export default function App() {
     lap: 0, 
     isFinished: false, 
     stamina: 100, 
-    wealth: 3000, 
+    wealth: 1500, 
     stress: 0, 
     spirit: 80, 
     belief: 30,
@@ -332,6 +332,13 @@ export default function App() {
     items: [],
     longInvestmentBonus: 0,
     hasUsedWeed: false,        // ★ 新增：是否使用過大麻
+    work1Count: 0,
+    work2Count: 0,
+    work3Count: 0,
+    work4Count: 0,
+    work5Count: 0,
+    negativeEventsCount: 0,
+    hasPositiveOnWork1: false,
   })));
 
   const allWorkEvents = [...WORK_POSITIVE_EVENTS, ...WORK_NEGATIVE_EVENTS];
@@ -372,44 +379,161 @@ const getMaxFeasibleSteps = (player, maxSteps) => {
   return maxReachable;
 };
 
-const drawCard = useCallback((isWork) => {
-  const currentPlayer = players[turnIndex];
-  const isHighStress = currentPlayer.stress >= 80;
-  const isLowSpirit  = currentPlayer.spirit <= 20;
+// ★★★ 這裡開始貼 GOAL_ICONS + getAvailableGoalsForPlayer ★★★
+  const GOAL_ICONS = [
+    { id: '打工皇帝', label: '打', color: 'bg-blue-500' },
+    { id: 'King of Leisure', label: 'K', color: 'bg-emerald-500' },
+    { id: '卷王', label: '卷', color: 'bg-purple-500' },
+    { id: '蛇王', label: '蛇', color: 'bg-rose-500' },
+    { id: '地獄黑仔王', label: '地', color: 'bg-red-600' },
+    { id: '瘋王', label: '瘋', color: 'bg-pink-500' },
+    { id: '邪教上帝', label: '邪', color: 'bg-indigo-500' },
+    { id: '山大王', label: '山', color: 'bg-amber-500' }
+  ];
 
-  const negativeBias = isHighStress || isLowSpirit ? 0.65 : 0.45;
+  const getAvailableGoalsForPlayer = (p) => {
+    const result = [];
+    if (p.victoryTitle) return result;
+
+    if (!p.hasLandedOnHoliday) {
+      const icon = GOAL_ICONS.find(g => g.id === '打工皇帝');
+      if (icon) result.push(icon);
+    }
+
+    if (!p.hasLandedOnWork) {
+      const icon = GOAL_ICONS.find(g => g.id === 'King of Leisure');
+      if (icon) result.push(icon);
+    }
+
+    // 山大王：有機會買到超過 5 張公司 10% 股份
+    const shareCount = (p.items || []).filter(it => it.id === 'companyshare').length;
+    const totalOthersShare = players
+      .filter(other => other.id !== p.id)
+      .reduce((sum, other) => {
+        const c = (other.items || []).filter(it => it.id === 'companyshare').length;
+        return sum + c;
+      }, 0);
+
+    // 總限售 10 張；只要自己還未 ≥5，且其他人總共 ≤4，就還有機會衝山大王
+    if (shareCount < 6 && totalOthersShare <= 4) {
+      const icon = GOAL_ICONS.find(g => g.id === '山大王');
+      if (icon) result.push(icon);
+    }
+
+    const work1 = p.work1Count || 0;
+    const work2 = p.work2Count || 0;
+    const work3 = p.work3Count || 0;
+    const work4 = p.work4Count || 0;
+    const work5 = p.work5Count || 0;
+    const hasPositiveOnWork1 = !!p.hasPositiveOnWork1;
+
+    const onlyWork1 =
+      work2 === 0 &&
+      work3 === 0 &&
+      work4 === 0 &&
+      work5 === 0;
+
+    if (onlyWork1) {
+  const icon = GOAL_ICONS.find(g => g.id === '卷王');
+  if (icon) result.push(icon);
+}
+
+    const onlyWork5 =
+      work1 === 0 &&
+      work2 === 0 &&
+      work3 === 0 &&
+      work4 === 0;
+
+    if (onlyWork5) {
+  const icon = GOAL_ICONS.find(g => g.id === '蛇王');
+  if (icon) result.push(icon);
+}
+
+    if (!hasPositiveOnWork1) {
+  const icon = GOAL_ICONS.find(g => g.id === '地獄黑仔王');
+  if (icon) result.push(icon);
+}
+
+    const madUnlocked = !!p.hasUnlockedMadKing;
+    const madWeedCount = p.madKingWeedCountAfterUnlock || 0;
+    if (madUnlocked && madWeedCount < 10) {
+      const icon = GOAL_ICONS.find(g => g.id === '瘋王');
+      if (icon) result.push(icon);
+    }
+
+    const cultUnlocked = !!p.hasUnlockedCultGod;
+    const donationCount = p.donationUseCount || 0;
+    const belief = p.belief || 0;
+    if (cultUnlocked && (donationCount < 10 || belief < 100)) {
+      const icon = GOAL_ICONS.find(g => g.id === '邪教上帝');
+      if (icon) result.push(icon);
+    }
+
+    return result;
+  };
+
+const drawCard = useCallback((isWork, cellCost = 0) => {
+  const currentPlayer = players[turnIndex];
+  const isHighStress = currentPlayer.stress > 80;
+  const isLowSpirit = currentPlayer.spirit < 20;
+
+  // 基礎負面率：壓力 / 精神
+  let negativeBias = (isHighStress || isLowSpirit) ? 0.65 : 0.45;
+
+  // 工作格再加上 cost 修正，cost 5 => +0.05
+  if (isWork) {
+    negativeBias += cellCost * 0.01;
+  }
+
+  // 夾在 [0, 0.9] 之間
+  negativeBias = Math.min(Math.max(negativeBias, 0), 0.9);
+
   let card;
 
   if (isWork) {
+    // 如果工作牌庫空了，重置
     if (workDeck.length === 0) {
       addLog("🔁 工作事件牌庫已洗牌重置。");
       const fullDeck = shuffleDeck([...WORK_POSITIVE_EVENTS, ...WORK_NEGATIVE_EVENTS]);
+      // 用新的牌庫繼續下面的流程
       card = fullDeck[0];
       setWorkDeck(fullDeck.slice(1));
-    } else {
-      const isNegative = Math.random() < negativeBias;
-      let candidatePool = isNegative
-        ? workDeck.filter(c => WORK_NEGATIVE_EVENTS.some(n => n.id === c.id))
-        : workDeck.filter(c => WORK_POSITIVE_EVENTS.some(p => p.id === c.id));
-      if (candidatePool.length === 0) candidatePool = workDeck;
-      card = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-      setWorkDeck(prev => prev.filter(c => c.id !== card.id));
+      return card;
     }
+
+    const isNegative = Math.random() < negativeBias;
+    let candidatePool = isNegative
+      ? workDeck.filter(c => WORK_NEGATIVE_EVENTS.some(n => n.id === c.id))
+      : workDeck.filter(c => WORK_POSITIVE_EVENTS.some(p => p.id === c.id));
+
+    if (candidatePool.length === 0) {
+      candidatePool = workDeck;
+    }
+
+    card = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+    setWorkDeck(prev => prev.filter(c => c.id !== card.id));
+
   } else {
+    // 假日牌庫
     if (holidayDeck.length === 0) {
       addLog("🔁 假日事件牌庫已洗牌重置。");
       const fullDeck = shuffleDeck([...HOLIDAY_POSITIVE_EVENTS, ...HOLIDAY_NEGATIVE_EVENTS]);
       card = fullDeck[0];
       setHolidayDeck(fullDeck.slice(1));
-    } else {
-      const isNegative = Math.random() < negativeBias;
-      let candidatePool = isNegative
-        ? holidayDeck.filter(c => HOLIDAY_NEGATIVE_EVENTS.some(n => n.id === c.id))
-        : holidayDeck.filter(c => HOLIDAY_POSITIVE_EVENTS.some(p => p.id === c.id));
-      if (candidatePool.length === 0) candidatePool = holidayDeck;
-      card = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-      setHolidayDeck(prev => prev.filter(c => c.id !== card.id));
+      return card;
     }
+
+    const isNegative = Math.random() < negativeBias;
+    let candidatePool = isNegative
+      ? holidayDeck.filter(c => HOLIDAY_NEGATIVE_EVENTS.some(n => n.id === c.id))
+      : holidayDeck.filter(c => HOLIDAY_POSITIVE_EVENTS.some(p => p.id === c.id));
+
+    if (candidatePool.length === 0) {
+      candidatePool = holidayDeck;
+    }
+
+    card = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+    setHolidayDeck(prev => prev.filter(c => c.id !== card.id));
   }
 
   return card;
@@ -523,7 +647,7 @@ const handleBuyItem = useCallback(
 
         if (itemToUse.target === 'first_work1') {
           p.lap += 1;
-          p.wealth = clamp(p.wealth + 1000, 0, 10000);
+          p.wealth = clamp(p.wealth + 500, 0, 10000);
           if (p.longInvestmentBonus > 0) {
             p.wealth = clamp(
               p.wealth + p.longInvestmentBonus,
@@ -532,7 +656,7 @@ const handleBuyItem = useCallback(
             );
           }
           addLog(
-            `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $1000${
+            `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $500${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ''
@@ -540,7 +664,7 @@ const handleBuyItem = useCallback(
           );
         } else if (itemToUse.target === 'holiday1' && fromPos !== 0) {
           p.lap += 1;
-          p.wealth = clamp(p.wealth + 1000, 0, 10000);
+          p.wealth = clamp(p.wealth + 500, 0, 10000);
           if (p.longInvestmentBonus > 0) {
             p.wealth = clamp(
               p.wealth + p.longInvestmentBonus,
@@ -549,7 +673,7 @@ const handleBuyItem = useCallback(
             );
           }
           addLog(
-            `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $1000${
+            `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $500${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ''
@@ -958,11 +1082,11 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
     // 跨越起點 → +1圈 +500 (+長線投資)
 if (prevPos !== 0 && nextPos === 0) {
   tempPlayer.lap += 1;
-  tempPlayer.wealth = clamp(tempPlayer.wealth + 1000, 0, 10000);
+  tempPlayer.wealth = clamp(tempPlayer.wealth + 500, 0, 10000);
   if (tempPlayer.longInvestmentBonus > 0) {
     tempPlayer.wealth = clamp(tempPlayer.wealth + tempPlayer.longInvestmentBonus, 0, 10000);
   }
-  addLog(`💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $1000${tempPlayer.longInvestmentBonus > 0 ? `（長線投資 +${tempPlayer.longInvestmentBonus}）` : ''}`);
+  addLog(`💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $500${tempPlayer.longInvestmentBonus > 0 ? `（長線投資 +${tempPlayer.longInvestmentBonus}）` : ''}`);
   if (tempPlayer.lap >= MAX_LAPS) tempPlayer.isFinished = true;
 }
 
@@ -1025,9 +1149,24 @@ if (prevPos !== 0 && nextPos === 0) {
   setPlayers(prev => {
     const next = [...prev];
     let finalP = { ...next[playerIndex] };
-    const cell = BOARD_CELLS[finalP.pos];
+const cell = BOARD_CELLS[finalP.pos];
+
+if (cell.type === 'work') {
+  if (cell.name === '工作日1') {
+    finalP.work1Count = (finalP.work1Count || 0) + 1;
+  } else if (cell.name === '工作日2') {
+    finalP.work2Count = (finalP.work2Count || 0) + 1;
+  } else if (cell.name === '工作日3') {
+    finalP.work3Count = (finalP.work3Count || 0) + 1;
+  } else if (cell.name === '工作日4') {
+    finalP.work4Count = (finalP.work4Count || 0) + 1;
+  } else if (cell.name === '工作日5') {
+    finalP.work5Count = (finalP.work5Count || 0) + 1;
+  }
+}
     const isWork = cell.type === 'work';
     const isHoliday = !!cell.holiday;
+    const cellCost = cell.cost || 0;   // ★ 新增：抓這格 cost 用來調負面機率
 
     // 勝利稱號（打工皇帝 / King of Leisure）
     if (finalP.isFinished && !finalP.victoryTitle) {
@@ -1040,6 +1179,48 @@ if (prevPos !== 0 && nextPos === 0) {
         return next;
       }
     }
+
+// ★ 卷王 / 蛇王 / 地獄黑仔王
+
+// 卷王 King of Competition：只踩工作1，且工作1 ≥ 52 次
+const onlyWork1 =
+  (finalP.work2Count || 0) === 0 &&
+  (finalP.work3Count || 0) === 0 &&
+  (finalP.work4Count || 0) === 0 &&
+  (finalP.work5Count || 0) === 0;
+
+if (!finalP.victoryTitle && onlyWork1 && (finalP.work1Count || 0) >= 52) {
+  finalP.victoryTitle = "卷王";
+}
+
+// 蛇王 Slack Off King：只踩工作5，且工作5 ≥ 52 次
+const onlyWork5 =
+  (finalP.work1Count || 0) === 0 &&
+  (finalP.work2Count || 0) === 0 &&
+  (finalP.work3Count || 0) === 0 &&
+  (finalP.work4Count || 0) === 0;
+
+if (!finalP.victoryTitle && onlyWork5 && (finalP.work5Count || 0) >= 52) {
+  finalP.victoryTitle = "蛇王";
+}
+
+// 地獄黑仔王 Bad Luck King：負面 ≥ 30，工作1無正面，工作1 ≥ 10 次
+if (
+  !finalP.victoryTitle &&
+  (finalP.negativeEventsCount || 0) >= 30 &&
+  !finalP.hasPositiveOnWork1 &&
+  (finalP.work1Count || 0) >= 10
+) {
+  finalP.victoryTitle = "地獄黑仔王";
+}
+
+// 若有任何 victoryTitle，直接結算
+if (finalP.victoryTitle) {
+  addLog(`🏆 ${finalP.name} 達成了【${finalP.victoryTitle}】！`);
+  next[playerIndex] = finalP;
+  setTimeout(() => setGameState('gameover'), 1500);
+  return next;
+}
 
     if (isWork) finalP.hasLandedOnWork = true;
     if (isHoliday) finalP.hasLandedOnHoliday = true;
@@ -1055,7 +1236,7 @@ if (prevPos !== 0 && nextPos === 0) {
     next[playerIndex] = finalP;
 
     setTimeout(() => {
-      const ev = drawCard(isWork);
+      const ev = drawCard(isWork, cellCost); // ★ 改成帶 cost
       setActiveEvent({ playerIndex, event: ev, isWork });
     }, 300);
 
@@ -1083,26 +1264,56 @@ if (prevPos !== 0 && nextPos === 0) {
 
   const applyEventEffect = () => {
   if (!activeEvent) return;
-  const { playerIndex, event } = activeEvent;
 
+  const { playerIndex, event } = activeEvent;
   let cultGodJustUnlocked = null;
 
   setPlayers(prev => {
     const next = [...prev];
     const p = { ...next[playerIndex] };
-    const e = event.effect;
+    const e = event.effect || {};
 
+    // 先做計數與旗標 -----------------------
+    const cell = BOARD_CELLS[p.pos];
+    const isWork = cell.type === 'work';
+    const isHoliday = !!cell.holiday;
+
+    // 根據實際名字是「工作日1～5」來計數
+    if (isWork) {
+      if (cell.name === "工作日1") p.work1Count = (p.work1Count || 0) + 1;
+      if (cell.name === "工作日2") p.work2Count = (p.work2Count || 0) + 1;
+      if (cell.name === "工作日3") p.work3Count = (p.work3Count || 0) + 1;
+      if (cell.name === "工作日4") p.work4Count = (p.work4Count || 0) + 1;
+      if (cell.name === "工作日5") p.work5Count = (p.work5Count || 0) + 1;
+    }
+
+    let isNegativeEvent = false;
+    if (isWork) {
+      isNegativeEvent = WORK_NEGATIVE_EVENTS.some(n => n.id === event.id);
+    } else if (isHoliday) {
+      isNegativeEvent = HOLIDAY_NEGATIVE_EVENTS.some(n => n.id === event.id);
+    }
+
+    // 統計負面事件，及工作日1的正面事件（地獄黑仔王用）
+    if (isNegativeEvent) {
+      p.negativeEventsCount = (p.negativeEventsCount || 0) + 1;
+    } else {
+      if (isWork && cell.name === "工作日1") {
+        p.hasPositiveOnWork1 = true;
+      }
+    }
+
+    // 再做原本的 belief 放大邏輯 ----------------
     const beliefBefore = p.belief || 0;
     const beliefNow = beliefBefore;
     const lowBelief = beliefNow < 30;
     const highBelief = beliefNow > 70;
 
-    // 根據信念放大 / 抑制負面效果
     const applyWithBelief = (key, base) => {
       if (!base) return 0;
       const isNegative = (key === 'stress')
-        ? base > 0          // 壓力增加視為負面
-        : base < 0;         // 其他屬性下降視為負面
+        ? base > 0
+        : base < 0;
       if (isNegative) {
         if (lowBelief) return base * 2;
         if (highBelief) return base * 0.5;
@@ -1122,7 +1333,7 @@ if (prevPos !== 0 && nextPos === 0) {
     if (dWealth)  p.wealth  = clamp(p.wealth  + dWealth,  0, 10000);
     if (dBelief)  p.belief  = clamp(p.belief  + dBelief,  0, 100);
 
-    // 邪教上帝：信念為 0 時抽到宗教宣傳 → 解鎖隱藏目標
+    // 邪教上帝判定 -----------------------------
     const evId = event.event?.id || event.id;
     const isReligionEvent = evId === 'w_religion' || evId === 'h_religion';
     if (!p.hasUnlockedCultGod && isReligionEvent && beliefBefore === 0) {
@@ -1154,10 +1365,10 @@ if (prevPos !== 0 && nextPos === 0) {
 // 專給 AI 用的簡化道具列表（只包含 AI 決策需要的欄位）
 const AI_ITEMDATA = useMemo(
   () => [
-    { id: 'overtime', price: 500 },
-    { id: 'companyhome', price: 1000 },
-    { id: 'shorttrip', price: 500 },
-    { id: 'longholiday', price: 1000 },
+    { id: 'overtime', price: 1000 },
+    { id: 'companyhome', price: 2000 },
+    { id: 'shorttrip', price: 1000 },
+    { id: 'longholiday', price: 2000 },
     { id: 'workunload', price: 1500 },
     { id: 'borrownotreturn', price: 1500 },
     { id: 'toughitout', price: 1500 },
@@ -1570,14 +1781,44 @@ if (gameState === 'gameover') {
   onClick={() => setShowInventory(idx)}
 >
                 <div className="flex justify-between items-center mb-3">
-                  <span className="font-black text-sm flex items-center gap-2 text-slate-100">
-                    <ShapeSVG color={p.color} shape={p.shape} size={16} />
-                    {p.name}
-                    {p.isAI && <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">AI</span>}
-                    {p.isFinished && <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">已達終點</span>}
-                  </span>
-                  <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">圈數: {p.lap}/{MAX_LAPS}</span>
-                </div>
+  {/* 左：名字＋標籤 */}
+  <span className="font-black text-sm flex items-center gap-2 text-slate-100">
+    <ShapeSVG color={p.color} shape={p.shape} size={16} />
+    {p.name}
+    {p.isAI && (
+      <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">
+        AI
+      </span>
+    )}
+    {p.isFinished && (
+      <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">
+        完成
+      </span>
+    )}
+  </span>
+
+  {/* 中：目標小方格列 */}
+  <div className="flex-1 flex justify-center gap-1 px-2">
+    {getAvailableGoalsForPlayer(p).map(goal => (
+      <div
+        key={goal.id}
+        className={
+          "w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-black text-slate-900 " +
+          goal.color +
+          " animate-pulse"
+        }
+      >
+        {goal.label}
+      </div>
+    ))}
+  </div>
+
+  {/* 右：圈數 */}
+  <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+    {p.lap}/{MAX_LAPS}
+  </span>
+</div>
+
                 <div className="space-y-2">
                   <StatBar label="體力" val={p.stamina} max={100} color="bg-emerald-500" />
                   <StatBar label="財力" val={p.wealth} max={10000} color="bg-amber-400" />
@@ -1648,37 +1889,93 @@ if (gameState === 'gameover') {
           </div>
         </div>
 
-        {activeEvent && (
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="w-[420px] bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
-              <div className={`py-4 text-center text-xs font-black text-white tracking-widest uppercase ${activeEvent.isWork ? 'bg-blue-600' : 'bg-emerald-600'}`}>
-                {activeEvent.isWork ? '📁 工作日隨機事件' : '🌴 假日隨機事件'}
-              </div>
-              <div className="p-8 text-center">
-                <p className="text-[10px] font-bold text-slate-400 mb-2 tracking-widest uppercase border-b border-slate-700 pb-2 inline-block">事件對象：{players[activeEvent.playerIndex]?.name}</p>
-                <h3 className="text-2xl font-black text-slate-200 mb-4">{activeEvent.event?.title}</h3>
-                <p className="text-sm font-bold text-slate-400 mb-8 leading-relaxed">{activeEvent.event?.desc}</p>
-                <div className="grid grid-cols-2 gap-3 mb-8 text-left">
-                  {activeEvent.event?.effect && Object.entries(activeEvent.event.effect).map(([k, v]) => (
-                    <div key={k} className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center px-4">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{k === 'wealth' ? '財力' : k === 'stamina' ? '體力' : k === 'stress' ? '壓力' : k === 'spirit' ? '精神' : '信念'}</span>
-                      <span className={`text-sm font-black font-mono ${v > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{v > 0 ? '+' : ''}{v}</span>
-                    </div>
-                  ))}
+        {activeEvent && (() => {
+          const isNegativeEvent = activeEvent.isWork
+            ? WORK_NEGATIVE_EVENTS.some(e => e.id === activeEvent.event?.id)
+            : HOLIDAY_NEGATIVE_EVENTS.some(e => e.id === activeEvent.event?.id);
+
+          return (
+            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="w-[420px] bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
+                <div
+                  className={
+                    "py-4 text-center text-xs font-black text-white tracking-widest uppercase " +
+                    (isNegativeEvent ? "bg-rose-600" : "bg-emerald-600")
+                  }
+                >
+                  {activeEvent.isWork ? "📁 工作日隨機事件" : "🌴 假日隨機事件"}
                 </div>
-                <button onClick={applyEventEffect} className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl text-sm font-black shadow-lg transition-all active:scale-95 uppercase tracking-widest">確認並結算</button>
+
+                <div className="p-8 text-center">
+                  <p className="text-[10px] font-bold text-slate-400 mb-2 tracking-widest uppercase border-b border-slate-700 pb-2 inline-block">
+                    事件對象：{players[activeEvent.playerIndex]?.name}
+                  </p>
+                  <h3 className="text-2xl font-black text-slate-200 mb-4">
+                    {activeEvent.event?.title}
+                  </h3>
+                  <p className="text-sm font-bold text-slate-400 mb-8 leading-relaxed">
+                    {activeEvent.event?.desc}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 mb-8 text-left">
+                    {activeEvent.event?.effect &&
+                      Object.entries(activeEvent.event.effect).map(([k, v]) => (
+                        <div
+                          key={k}
+                          className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center px-4"
+                        >
+                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            {k === 'wealth'
+                              ? '財力'
+                              : k === 'stamina'
+                              ? '體力'
+                              : k === 'stress'
+                              ? '壓力'
+                              : k === 'spirit'
+                              ? '精神'
+                              : '信念'}
+                          </span>
+                          <span
+                            className={`text-sm font-black font-mono ${
+                              v > 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}
+                          >
+                            {v > 0 ? '+' : ''}
+                            {v}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+
+                  <button
+                    onClick={applyEventEffect}
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl text-sm font-black shadow-lg transition-all active:scale-95 uppercase tracking-widest"
+                  >
+                    確認並結算
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
-{viewingDeck && (
+        {/* 卡池查看彈窗（保持原本邏輯） */}
+        {viewingDeck && (
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="w-[500px] max-h-[80vh] flex flex-col bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
-              <div className={`py-4 flex justify-between items-center px-6 ${viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
-                <span className="text-sm font-black text-white tracking-widest uppercase">{viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}</span>
-                <span className="text-xs font-black text-white/80">剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}</span>
+              <div
+                className={`py-4 flex justify-between items-center px-6 ${
+                  viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'
+                }`}
+              >
+                <span className="text-sm font-black text-white tracking-widest uppercase">
+                  {viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}
+                </span>
+                <span className="text-xs font-black text-white/80">
+                  剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}
+                </span>
               </div>
+
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950">
                 {(viewingDeck === 'work' ? workDeck : holidayDeck).map((card, i) => (
                   <div key={i} className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
@@ -1686,14 +1983,39 @@ if (gameState === 'gameover') {
                     <p className="text-[11px] text-slate-400 font-bold mb-3">{card.desc}</p>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(card.effect).map(([k, v]) => (
-                         <span key={k} className={`text-[10px] px-2 py-0.5 rounded font-black ${v > 0 ? 'bg-emerald-950/50 text-emerald-400' : 'bg-rose-950/50 text-rose-400'}`}>{k === 'wealth' ? '財力' : k === 'stamina' ? '體力' : k === 'stress' ? '壓力' : k === 'spirit' ? '精神' : '信念'} {v > 0 ? '+' : ''}{v}</span>
+                        <span
+                          key={k}
+                          className={`text-[10px] px-2 py-0.5 rounded font-black ${
+                            v > 0
+                              ? 'bg-emerald-950/50 text-emerald-400'
+                              : 'bg-rose-950/50 text-rose-400'
+                          }`}
+                        >
+                          {k === 'wealth'
+                            ? '財力'
+                            : k === 'stamina'
+                            ? '體力'
+                            : k === 'stress'
+                            ? '壓力'
+                            : k === 'spirit'
+                            ? '精神'
+                            : '信念'}{' '}
+                          {v > 0 ? '+' : ''}
+                          {v}
+                        </span>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
+
               <div className="p-4 bg-slate-900 border-t border-slate-800">
-                <button onClick={() => setViewingDeck(null)} className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest">關閉視窗</button>
+                <button
+                  onClick={() => setViewingDeck(null)}
+                  className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest"
+                >
+                  關閉視窗
+                </button>
               </div>
             </div>
           </div>
@@ -1995,7 +2317,7 @@ function SetupScreen({ onProceed }) {
         <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 mb-6 text-left overflow-y-auto custom-scrollbar flex-1 max-h-[45vh]">
           <h3 className="text-blue-400 font-black text-sm mb-3 tracking-widest border-b border-slate-800 pb-2">📜 遊戲玩法與規則</h3>
           <ul className="text-[11px] text-slate-300 space-y-2 mb-6 leading-relaxed">
-            <li><span className="text-emerald-400 font-bold"> 📆行動與消耗：</span>1. 玩家可以自由選擇移動距離，經過「起點」可領薪 $1000。經過「工作日」會消耗該格相應的體力、精神及增加壓力；停留在「假日」則可恢復10點體力及精神與減少10點壓力。2. 每次經過棋盤的「工作日5」，都必須繳納一週的固定開支 $50。3. 當停留在工作日或假日時會觸發相應隨機事件卡抽取。4. 玩家需在36個圈內爭取完成任一遊戲目標，若走完36圈都未能完成則失去資格。5. 當全部玩家都走完36圈時，遊戲結束。</li>
+            <li><span className="text-emerald-400 font-bold"> 📆行動與消耗：</span>1. 玩家可以自由選擇移動距離，經過「起點」可領薪 $500。經過「工作日」會消耗該格相應的體力、精神及增加壓力，停留在工作日格時則按其標示增加負面事件卡的機率；停留在「假日」則可恢復10點體力及精神與減少10點壓力。2. 每次經過棋盤的「工作日5」，都必須繳納一週的固定開支 $50。3. 當停留在工作日或假日時會觸發相應隨機事件卡抽取。4. 玩家需在36個圈內爭取完成任一遊戲目標，若走完36圈都未能完成則失去資格。5. 當全部玩家都走完36圈時，遊戲結束。</li>
             <li><span className="text-emerald-400 font-bold">🛍️ 道具卡：</span>玩家可以在自己回合內點擊道具卡區購買道具卡，點擊自己的玩家資訊欄查看及使用已購買的道具卡。每回合只能使用一次且使用後會在原地停留。</li>
                         <li><span className="text-rose-400 font-bold">⚠️ 數值預警：</span>1. 當玩家「壓力 {'>'} 80」或「精神 {'<'} 20」時，抽中<span className="text-rose-400">負面事件</span>的機率將會飆升！2. 當玩家信念低於30時，隨機事件的負面效果加倍，大於70時則減半。</li>
             <li><span className="text-indigo-400 font-bold">🚑 社會救濟金：</span>體力透支時可花相應體力的10倍財力強行移動 1 格；若財力不足以支付每週開支，將強制遣返起點獲社會救濟 $500且圈數+1。</li>
@@ -2007,6 +2329,9 @@ function SetupScreen({ onProceed }) {
             <li><span className="text-rose-500 font-bold">👑 打工皇帝：</span>36圈內從未停留在假日格。</li>
             <li><span className="text-slate-100 font-bold">👑 King of Leisure：</span>36圈內從未停留在工作日格。</li>
             <li><span className="text-yellow-400 font-bold">👑 山大王：</span>購買並持有超過50%公司股份。</li>
+            <li><span className="text-yellow-400 font-bold">👑 卷王：</span>36圈內從未停留過在工作日1以外的工作日，且至少停留在工作日1 52次。</li>
+            <li><span className="text-yellow-400 font-bold">👑 蛇王：</span>36圈內從未停留過在工作日5以外的工作日，且至少停留在工作日5 52次。</li>
+            <li><span className="text-yellow-400 font-bold">👑 地獄黑仔王：</span>36圈內從未在工作日1中抽過正面事件卡，且至少在工作日1抽過10次負面事件卡及全局中負面事件卡抽取總數不少於30。</li>
             <li><span className="text-purple-400 font-bold">👑 兩個隱藏目標：</span>請在遊戲中探索。</li>
             </ul>
         </div>
@@ -2065,31 +2390,42 @@ function GameOverScreen({ players }) {
   const winner = players.find(p => p.victoryTitle);
 
   // 依不同成就選擇圖片（放在 public/picture 底下）
-const victoryImage =
-  winner?.victoryTitle === "King of Leisure"
-    ? process.env.PUBLIC_URL + "/picture/kingofleisure.png"
-    : winner?.victoryTitle === "打工皇帝"
-    ? process.env.PUBLIC_URL + "/picture/kingofwork.png"
-    : winner?.victoryTitle === "山大王"
-    ? process.env.PUBLIC_URL + "/picture/kingofcompany.png"
-    : winner?.victoryTitle === "瘋王"
-    ? process.env.PUBLIC_URL + "/picture/madking.png"
-    : winner?.victoryTitle === "邪教上帝"
-    ? process.env.PUBLIC_URL + "/picture/cultgod.png"
-    : null;
+const victoryImage = winner?.victoryTitle === "King of Leisure"
+  ? process.env.PUBLIC_URL + "/picture_kingofleisure.png"
+  : winner?.victoryTitle === "打工皇帝"
+  ? process.env.PUBLIC_URL + "/picture_kingofwork.png"
+  : winner?.victoryTitle === "公司大股東"
+  ? process.env.PUBLIC_URL + "/picture_kingofcompany.png"
+  : winner?.victoryTitle === "瘋狂之王"
+  ? process.env.PUBLIC_URL + "/picture_madking.png"
+  : winner?.victoryTitle === "邪教上帝"
+  ? process.env.PUBLIC_URL + "/picture_cultgod.png"
+  : winner?.victoryTitle === "King of Competition"
+  ? process.env.PUBLIC_URL + "/picture_kingofcompetition.png"
+  : winner?.victoryTitle === "Slack Off King"
+  ? process.env.PUBLIC_URL + "/picture_slackoffking.png"
+  : winner?.victoryTitle === "Bad Luck King"
+  ? process.env.PUBLIC_URL + "/picture_badluckking.png"
+  : null;
 
   // 不同成就專屬祝賀訊息
   const congratsMessage =
     winner?.victoryTitle === "打工皇帝"
-      ? "你在 36 圈內從未停留在假日格，成為社畜中的傳奇打工皇帝。"
+      ? "你從未停留在假日格，成為社畜中的傳奇打工皇帝。"
       : winner?.victoryTitle === "King of Leisure"
-      ? "你在 36 圈內從未停留在工作日格，用一生證明躺平才是王道。"
+      ? "你從未停留在工作日格，用一生證明躺平才是王道。"
       : winner?.victoryTitle === "山大王"
       ? "你囤積公司股份成為資本山大王，在無間輪迴中掌控整個公司職場版圖。"
       : winner?.victoryTitle === "瘋王"
       ? "你在壓力與大麻之間反覆橫跳，最終登基為扭曲三觀的瘋王。"
       : winner?.victoryTitle === "邪教上帝"
       ? "你在信念歸零後重建信仰，靠奉獻堆到滿，成為無間輪迴中的邪教上帝。"
+      : winner?.victoryTitle === "卷王"
+      ? "你只在高強度工作中打轉，硬撐 52 次，成為真正的卷王。"
+      : winner?.victoryTitle === "蛇王"
+      ? "你堅持只在輕度工作中混日子，成為名符其實的蛇王。"
+      : winner?.victoryTitle === "地獄黑仔王"
+      ? "在無數負面事件與地獄般的工作洗禮下，你榮登地獄黑仔王。"
       : "你已在無間輪迴中，寫下了屬於自己的傳奇。";
 
   // 按鈕文字也可依不同成就微調
@@ -2104,6 +2440,12 @@ const victoryImage =
       ? "繼續輪迴 • 再瘋一次看看"
       : winner?.victoryTitle === "邪教上帝"
       ? "繼續輪迴 • 帶領信徒重開一局"
+      : winner?.victoryTitle === "卷王"
+      ? "繼續輪迴 • 再次卷贏其他人"
+      : winner?.victoryTitle === "蛇王"
+      ? "繼續輪迴 • 把工作留給其他人"
+      : winner?.victoryTitle === "地獄黑仔王"
+      ? "繼續輪迴 • 最深的黑暗將是黎明的開始"
       : "繼續輪迴 • 開始新的一輪";
 
   return (
