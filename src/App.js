@@ -2779,7 +2779,7 @@ function SetupScreen({ onProceed }) {
         <h1 className="text-5xl font-black mb-2 text-yellow-300 tracking-tighter mt-2 drop-shadow-[0_0_18px_rgba(252,211,77,0.75)]">課金帝國</h1>
         <p className="text-sm tracking-[0.35em] uppercase text-yellow-200 mb-6 text-center">THE IAP EMPIRE</p>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 mb-6 text-left overflow-y-auto custom-scrollbar flex-1 max-h-[45vh]">
+        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 mb-6 text-left overflow-y-auto custom-scrollbar flex-1 max-h-[45vh]">
           <h3 className="text-blue-400 font-black text-sm mb-3 tracking-widest border-b border-slate-800 pb-2">📜 遊戲玩法與規則</h3>
           <ul className="text-[11px] text-slate-300 space-y-2 mb-6 leading-relaxed">
             <li><span className="text-emerald-400 font-bold"> 📆行動與消耗：</span>1. 玩家可以自由選擇移動距離，經過「起點」可領薪 $500。經過「工作日」會消耗該格相應的體力、精神及增加壓力，停留在工作日格時則按其標示增加負面事件卡的百分比機率；停留在「假日」則可恢復10點體力及精神與減少10點壓力。2. 每次經過棋盤的「工作日5」，都必須繳納一週的固定開支 $50。3. 當停留在工作日或假日時會觸發相應隨機事件卡抽取。4. 遊戲最大圈數為24，玩家需在24個圈內爭取完成任一遊戲目標，若走完24圈都未能完成則失去資格。5. 當有玩家達成任一遊戲目標或全部玩家都走完24圈時，遊戲結束。</li>
