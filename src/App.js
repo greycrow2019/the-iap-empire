@@ -218,7 +218,7 @@ const ITEM_DATA = [
   id: 'blessing',
   title: '<祈福三寶>',
   price: 500,
-  desc: '暫時提升信念 40，持續一圈，期間所有負面事件的打擊都會減輕。',
+  desc: '暫時提升信念 40，持續一圈。',
   imageUrl: process.env.PUBLIC_URL + '/picture/blessing.png',
   requiresTarget: false,
 },
