@@ -3013,212 +3013,214 @@ useEffect(() => {
 
  let content;
 
-  if (gameState === 'setup') {
-    content = <SetupScreen onProceed={proceedToNaming} />;
-  } else if (gameState === 'naming') {
-    content = (
-      <NamingScreen
-        players={players}
-        setPlayers={setPlayers}
-        onFinalize={finalizeStart}
-      />
-    );
-  } else if (gameState === 'gameover') {
-    content = <GameOverScreen players={players} />;
-  } else {
-    const currentPlayer = players[turnIndex];
+if (gameState === 'setup') {
+  content = <SetupScreen onProceed={proceedToNaming} />;
+} else if (gameState === 'naming') {
+  content = (
+    <NamingScreen
+      players={players}
+      setPlayers={setPlayers}
+      onFinalize={finalizeStart}
+    />
+  );
+} else if (gameState === 'gameover') {
+  content = <GameOverScreen players={players} />;
+} else {
+  const currentPlayer = players[turnIndex];
 
-    content = (
-      <div className="flex h-screen w-full bg-slate-900 p-4 gap-4 font-sans text-slate-200 overflow-hidden">
-        {/* 左側：玩家資訊 + Log */}
-        <div className="w-[380px] flex flex-col gap-4 shrink-0">
-          <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden shadow-2xl relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
-            <h2 className="text-xs font-black text-slate-400 mb-3 uppercase tracking-widest flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-4 bg-amber-500 rounded-sm"></span>
-                玩家資訊欄
+  content = (
+    <div className="flex h-screen w-full bg-slate-900 p-4 gap-4 font-sans text-slate-200 overflow-hidden">
+      {/* 左側：玩家資訊 + Log */}
+      <div className="w-[380px] flex flex-col gap-4 shrink-0">
+        <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden shadow-2xl relative">
+          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
+          <h2 className="text-xs font-black text-slate-400 mb-3 uppercase tracking-widest flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-amber-500 rounded-sm"></span>
+              玩家資訊欄
+            </span>
+            {currentPlayer && !currentPlayer.isFinished && (
+              <span className="text-[10px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded-md border border-emerald-800/50 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                行動中：{currentPlayer.name}
               </span>
-              {currentPlayer && !currentPlayer.isFinished && (
-                <span className="text-[10px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded-md border border-emerald-800/50 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                  行動中：{currentPlayer.name}
-                </span>
-              )}
-            </h2>
-            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-              {players.map((p, idx) => (
-                <div 
-                  key={p.id} 
-                  className={`p-3 rounded-lg border transition-all cursor-pointer hover:ring-2 hover:ring-purple-400 ${
-                    idx === turnIndex && !p.isFinished
-                      ? 'border-blue-500/80 bg-slate-900 scale-[1.02]'
-                      : 'border-slate-800 bg-slate-950 opacity-80'
-                  }`}
-                  onClick={() => setShowInventory(idx)}
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    {/* 左：名字＋標籤 */}
-                    <span className="font-black text-sm flex items-center gap-2 text-slate-100">
-                      <ShapeSVG color={p.color} shape={p.shape} size={16} />
-                      {p.name}
-                      {p.isAI && (
-                        <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">
-                          AI
-                        </span>
-                      )}
-                      {p.isFinished && (
-                        <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">
-                          完成
-                        </span>
-                      )}
-                    </span>
-
-                    {/* 中：目標小方格列 */}
-                    <div className="flex-1 flex justify-center gap-1 px-2">
-                      {getAvailableGoalsForPlayer(p).map(goal => (
-                        <div
-                          key={goal.id}
-                          className={
-                            "w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-black text-slate-900 " +
-                            goal.color +
-                            " animate-pulse"
-                          }
-                        >
-                          {goal.label}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* 右：圈數 */}
-                    <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
-                      {p.lap}/{MAX_LAPS}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <StatBar label="體力" val={p.stamina} max={100} color="bg-emerald-500" />
-                    <StatBar label="財力" val={p.wealth} max={10000} color="bg-amber-400" />
-                    <StatBar label="壓力" val={p.stress} max={100} color="bg-rose-500" />
-                    <StatBar label="精神" val={p.spirit} max={100} color="bg-cyan-500" />
-                    <StatBar label="信念" val={p.belief} max={100} color="bg-indigo-400" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="h-[30vh] bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col shadow-2xl relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/50"></div>
-            <div className="flex gap-2 mb-3">
-              <input
-                type="number"
-                min="1"
-                max="24"
-                value={customSteps}
-                onChange={e => setCustomSteps(e.target.value)}
-                disabled={
-                  players[turnIndex]?.isAI ||
-                  isMoving ||
-                  activeEvent ||
-                  viewingDeck ||
-                  players[turnIndex]?.isFinished
-                }
-                className="w-20 bg-slate-900 border border-slate-700 rounded-lg text-center font-black text-xl outline-none focus:border-blue-500 transition-colors text-slate-200"
-              />
-              <button
-                onClick={() => handleMove(customSteps)}
-                disabled={
-                  players[turnIndex]?.isAI ||
-                  isMoving ||
-                  activeEvent ||
-                  viewingDeck ||
-                  players[turnIndex]?.isFinished
-                }
-                className="flex-1 bg-blue-600 text-white font-black text-lg rounded-lg hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-30 tracking-widest"
+            )}
+          </h2>
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2" data-scrollable="true">
+            {players.map((p, idx) => (
+              <div 
+                key={p.id} 
+                className={`p-3 rounded-lg border transition-all cursor-pointer hover:ring-2 hover:ring-purple-400 ${
+                  idx === turnIndex && !p.isFinished
+                    ? 'border-blue-500/80 bg-slate-900 scale-[1.02]'
+                    : 'border-slate-800 bg-slate-950 opacity-80'
+                }`}
+                onClick={() => setShowInventory(idx)}
               >
-                確認行動
-              </button>
-            </div>
-            <div className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-3 overflow-y-auto text-[11px] font-mono text-slate-400 space-y-1.5">
-              {logs.map(l => (
-                <div key={l.id} className="border-b border-slate-800/50 pb-1">
-                  {l.text}
+                <div className="flex justify-between items-center mb-3">
+                  {/* 左：名字＋標籤 */}
+                  <span className="font-black text-sm flex items-center gap-2 text-slate-100">
+                    <ShapeSVG color={p.color} shape={p.shape} size={16} />
+                    {p.name}
+                    {p.isAI && (
+                      <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">
+                        AI
+                      </span>
+                    )}
+                    {p.isFinished && (
+                      <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">
+                        完成
+                      </span>
+                    )}
+                  </span>
+
+                  {/* 中：目標小方格列 */}
+                  <div className="flex-1 flex justify-center gap-1 px-2">
+                    {getAvailableGoalsForPlayer(p).map(goal => (
+                      <div
+                        key={goal.id}
+                        className={
+                          "w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-black text-slate-900 " +
+                          goal.color +
+                          " animate-pulse"
+                        }
+                      >
+                        {goal.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 右：圈數 */}
+                  <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                    {p.lap}/{MAX_LAPS}
+                  </span>
                 </div>
-              ))}
-              <div ref={logEndRef} />
-            </div>
+
+                <div className="space-y-2">
+                  <StatBar label="體力" val={p.stamina} max={100} color="bg-emerald-500" />
+                  <StatBar label="財力" val={p.wealth} max={10000} color="bg-amber-400" />
+                  <StatBar label="壓力" val={p.stress} max={100} color="bg-rose-500" />
+                  <StatBar label="精神" val={p.spirit} max={100} color="bg-cyan-500" />
+                  <StatBar label="信念" val={p.belief} max={100} color="bg-indigo-400" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-       {/* 右側棋盤、商店等 —— 這裡把你原來的 JSX 全部保留 */}
-<div className="flex-1 border border-slate-800 bg-slate-950/50 rounded-xl p-2 flex items-center justify-center overflow-hidden shadow-inner relative">
-  <div
-    className="relative aspect-square grid grid-cols-7 grid-rows-7 gap-2 bg-slate-950 p-2 rounded-2xl border border-slate-800/80"
-    style={{ height: 'min(100%, 90vw)' }}
-  >
-    {BOARD_CELLS.map(cell => (
-      <BoardCell
-        key={cell.id}
-        data={cell}
-        players={players.filter(p => p.pos === cell.id && !p.isFinished)}
-      />
-    ))}
-
-    {/* ★ 中央操作面板：搬進 grid 裡面，摆在棋盤中央 */}
-    <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center gap-4 z-0 relative">
-      {/* 道具卡按鈕 */}
-      <button 
-        onClick={() => {
-          const cp = players[turnIndex];
-          if (cp && !cp.isAI && !isMoving && !activeEvent && !viewingDeck && !cp.isFinished) {
-            setShowShop(true);
-          } else if (cp && cp.isAI) {
-            addLog("🤖 AI 無法購買道具卡");
-          }
-        }}
-        className="group relative w-[18vh] h-[13vh] bg-slate-900 border-2 border-purple-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:scale-105 transition-transform"
-      >
-        <p className="text-[2.2vh] font-black text-purple-300 leading-tight text-center tracking-widest">
-          道具卡
-        </p>
-      </button>
-
-      {/* 事件卡池按鈕 */}
-      <div className="flex gap-8">
-        <button
-          onClick={() => setViewingDeck('work')}
-          className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-blue-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-105 transition-transform"
-        >
-          <div className="absolute top-1 right-2 text-[10px] font-black text-blue-400">
-            {workDeck.length}/{WORK_POSITIVE_EVENTS.length + WORK_NEGATIVE_EVENTS.length}
+        <div className="h-[30vh] bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col shadow-2xl relative">
+          <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/50"></div>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="number"
+              min="1"
+              max="24"
+              value={customSteps}
+              onChange={e => setCustomSteps(e.target.value)}
+              disabled={
+                players[turnIndex]?.isAI ||
+                isMoving ||
+                activeEvent ||
+                viewingDeck ||
+                players[turnIndex]?.isFinished
+              }
+              className="w-20 bg-slate-900 border border-slate-700 rounded-lg text-center font-black text-xl outline-none focus:border-blue-500 transition-colors text-slate-200"
+            />
+            <button
+              onClick={() => handleMove(customSteps)}
+              disabled={
+                players[turnIndex]?.isAI ||
+                isMoving ||
+                activeEvent ||
+                viewingDeck ||
+                players[turnIndex]?.isFinished
+              }
+              className="flex-1 bg-blue-600 text-white font-black text-lg rounded-lg hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-30 tracking-widest"
+            >
+              確認行動
+            </button>
           </div>
-          <p className="text-[2.2vh] font-black text-blue-300 leading-tight text-center tracking-widest">
-            工作日<br />事件卡
-          </p>
-        </button>
-
-        <button
-          onClick={() => setViewingDeck('holiday')}
-          className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-emerald-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:scale-105 transition-transform"
-        >
-          <div className="absolute top-1 right-2 text-[10px] font-black text-emerald-400">
-            {holidayDeck.length}/{HOLIDAY_POSITIVE_EVENTS.length + HOLIDAY_NEGATIVE_EVENTS.length}
+          <div
+            className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-3 overflow-y-auto text-[11px] font-mono text-slate-400 space-y-1.5"
+            data-scrollable="true"
+          >
+            {logs.map(l => (
+              <div key={l.id} className="border-b border-slate-800/50 pb-1">
+                {l.text}
+              </div>
+            ))}
+            <div ref={logEndRef} />
           </div>
-          <p className="text-[2.2vh] font-black text-emerald-300 leading-tight text-center tracking-widest">
-            假日<br />事件卡
-          </p>
-        </button>
+        </div>
       </div>
 
-      <div className="mt-2 text-center select-none pointer-events-none opacity-20">
-        <h2 className="text-[5vh] font-black tracking-[0.2em] text-white">
-          無間輪迴
-        </h2>
-      </div>
-    </div>
-    {/* ★ 中央操作面板結束 */}
-  </div>
+      {/* 右側棋盤、商店等 —— 這裡把你原來的 JSX 全部保留 */}
+      <div className="flex-1 border border-slate-800 bg-slate-950/50 rounded-xl p-2 flex items-center justify-center overflow-hidden shadow-inner relative">
+        <div
+          className="relative aspect-square grid grid-cols-7 grid-rows-7 gap-2 bg-slate-950 p-2 rounded-2xl border border-slate-800/80"
+          style={{ height: 'min(100%, 90vw)' }}
+        >
+          {BOARD_CELLS.map(cell => (
+            <BoardCell
+              key={cell.id}
+              data={cell}
+              players={players.filter(p => p.pos === cell.id && !p.isFinished)}
+            />
+          ))}
+
+          {/* ★ 中央操作面板：搬進 grid 裡面，摆在棋盤中央 */}
+          <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center gap-4 z-0 relative">
+            {/* 道具卡按鈕 */}
+            <button 
+              onClick={() => {
+                const cp = players[turnIndex];
+                if (cp && !cp.isAI && !isMoving && !activeEvent && !viewingDeck && !cp.isFinished) {
+                  setShowShop(true);
+                } else if (cp && cp.isAI) {
+                  addLog("🤖 AI 無法購買道具卡");
+                }
+              }}
+              className="group relative w-[18vh] h-[13vh] bg-slate-900 border-2 border-purple-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:scale-105 transition-transform"
+            >
+              <p className="text-[2.2vh] font-black text-purple-300 leading-tight text-center tracking-widest">
+                道具卡
+              </p>
+            </button>
+
+            {/* 事件卡池按鈕 */}
+            <div className="flex gap-8">
+              <button
+                onClick={() => setViewingDeck('work')}
+                className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-blue-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-105 transition-transform"
+              >
+                <div className="absolute top-1 right-2 text-[10px] font-black text-blue-400">
+                  {workDeck.length}/{WORK_POSITIVE_EVENTS.length + WORK_NEGATIVE_EVENTS.length}
+                </div>
+                <p className="text-[2.2vh] font-black text-blue-300 leading-tight text-center tracking-widest">
+                  工作日<br />事件卡
+                </p>
+              </button>
+
+              <button
+                onClick={() => setViewingDeck('holiday')}
+                className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-emerald-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:scale-105 transition-transform"
+              >
+                <div className="absolute top-1 right-2 text-[10px] font-black text-emerald-400">
+                  {holidayDeck.length}/{HOLIDAY_POSITIVE_EVENTS.length + HOLIDAY_NEGATIVE_EVENTS.length}
+                </div>
+                <p className="text-[2.2vh] font-black text-emerald-300 leading-tight text-center tracking-widest">
+                  假日<br />事件卡
+                </p>
+              </button>
+            </div>
+
+            <div className="mt-2 text-center select-none pointer-events-none opacity-20">
+              <h2 className="text-[5vh] font-black tracking-[0.2em] text-white">
+                無間輪迴
+              </h2>
+            </div>
+          </div>
+        </div>
 
         {/* ====== 留言板 Icon（右下角） ====== */}
         <div className="absolute bottom-4 right-4 z-40">
@@ -3253,7 +3255,10 @@ useEffect(() => {
             </div>
 
             {/* 可捲動的留言內容 */}
-            <div className="flex-1 overflow-y-auto px-3 py-2 text-[11px] space-y-1 bg-slate-950">
+            <div
+              className="flex-1 overflow-y-auto px-3 py-2 text-[11px] space-y-1 bg-slate-950"
+              data-scrollable="true"
+            >
               {messages.length === 0 && (
                 <div className="text-slate-500">目前沒有任何留言。</div>
               )}
@@ -3356,83 +3361,86 @@ useEffect(() => {
         })()}
 
         {/* ====== 事件卡池查看 Modal ====== */}
-{viewingDeck && (
-  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
-    <div className="w-[500px] max-h-[80vh] flex flex-col bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
-      <div
-        className={`py-4 flex justify-between items-center px-6 ${
-          viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'
-        }`}
-      >
-        <span className="text-sm font-black text-white tracking-widest uppercase">
-          {viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}
-        </span>
-        <span className="text-xs font-black text-white/80">
-          剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}
-        </span>
-      </div>
+        {viewingDeck && (
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="w-[500px] max-h-[80vh] flex flex-col bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
+              <div
+                className={`py-4 flex justify-between items-center px-6 ${
+                  viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'
+                }`}
+              >
+                <span className="text-sm font-black text-white tracking-widest uppercase">
+                  {viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}
+                </span>
+                <span className="text-xs font-black text-white/80">
+                  剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}
+                </span>
+              </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950">
-        {(viewingDeck === 'work' ? workDeck : holidayDeck).map((card, i) => {
-          const polarity = getEventPolarity(card);
-          const cardBgClass =
-            polarity === 'positive'
-              ? 'bg-emerald-700 border-emerald-400'  // ✅ 明顯綠底
-              : polarity === 'negative'
-              ? 'bg-rose-700 border-rose-400'        // ✅ 明顯紅底
-              : 'bg-slate-900 border-slate-800';
+              <div
+                className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950"
+                data-scrollable="true"
+              >
+                {(viewingDeck === 'work' ? workDeck : holidayDeck).map((card, i) => {
+                  const polarity = getEventPolarity(card);
+                  const cardBgClass =
+                    polarity === 'positive'
+                      ? 'bg-emerald-700 border-emerald-400'
+                      : polarity === 'negative'
+                      ? 'bg-rose-700 border-rose-400'
+                      : 'bg-slate-900 border-slate-800';
 
-          return (
-            <div
-              key={i}
-              className={`p-4 rounded-xl border ${cardBgClass}`}
-            >
-              <h4 className="text-sm font-black text-white mb-1">
-                {card.title}
-              </h4>
-              <p className="text-[11px] text-slate-100 font-bold mb-3 whitespace-pre-line">
-                {card.desc}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(card.effect).map(([k, v]) => (
-                  <span
-                    key={k}
-                    className={`text-[10px] px-2 py-0.5 rounded font-black ${
-                      v > 0
-                        ? 'bg-emerald-300 text-emerald-900'  // ✅ 高對比正向標籤
-                        : 'bg-rose-300 text-rose-900'        // ✅ 高對比負向標籤
-                    }`}
-                  >
-                    {k === 'wealth'
-                      ? '財力'
-                      : k === 'stamina'
-                      ? '體力'
-                      : k === 'stress'
-                      ? '壓力'
-                      : k === 'spirit'
-                      ? '精神'
-                      : '信念'}{' '}
-                    {v > 0 ? '+' : ''}
-                    {v}
-                  </span>
-                ))}
+                  return (
+                    <div
+                      key={i}
+                      className={`p-4 rounded-xl border ${cardBgClass}`}
+                    >
+                      <h4 className="text-sm font-black text-white mb-1">
+                        {card.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-100 font-bold mb-3 whitespace-pre-line">
+                        {card.desc}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(card.effect).map(([k, v]) => (
+                          <span
+                            key={k}
+                            className={`text-[10px] px-2 py-0.5 rounded font-black ${
+                              v > 0
+                                ? 'bg-emerald-300 text-emerald-900'
+                                : 'bg-rose-300 text-rose-900'
+                            }`}
+                          >
+                            {k === 'wealth'
+                              ? '財力'
+                              : k === 'stamina'
+                              ? '體力'
+                              : k === 'stress'
+                              ? '壓力'
+                              : k === 'spirit'
+                              ? '精神'
+                              : '信念'}{' '}
+                            {v > 0 ? '+' : ''}
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="p-4 bg-slate-900 border-t border-slate-800">
+                <button
+                  onClick={() => setViewingDeck(null)}
+                  className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest"
+                >
+                  關閉視窗
+                </button>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="p-4 bg-slate-900 border-t border-slate-800">
-        <button
-          onClick={() => setViewingDeck(null)}
-          className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest"
-        >
-          關閉視窗
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+          </div>
+        )}
 
         {/* ====== 道具卡商店 Modal ====== */}
         {showShop && (
@@ -3442,7 +3450,10 @@ useEffect(() => {
                 🛍️ 道具卡商店
               </div>
 
-              <div className="flex-1 p-6 grid grid-cols-2 gap-6 overflow-y-auto">
+              <div
+                className="flex-1 p-6 grid grid-cols-2 gap-6 overflow-y-auto"
+                data-scrollable="true"
+              >
                 {ITEM_DATA.map((item) => {
                   const qty = shopQuantities[item.id] || 1;
                   const totalPrice = item.price * qty;
@@ -3515,7 +3526,10 @@ useEffect(() => {
                   共 {players[showInventory].items?.length || 0} 張
                 </span>
               </div>
-              <div className="p-6 flex-1 overflow-y-auto space-y-4">
+              <div
+                className="p-6 flex-1 overflow-y-auto space-y-4"
+                data-scrollable="true"
+              >
                 {players[showInventory].items && players[showInventory].items.length > 0 ? (
                   players[showInventory].items.map((item, idx) => (
                     <div
@@ -3561,7 +3575,7 @@ useEffect(() => {
         {showItemEffect && (
           <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-[60]">
             <div className="w-[90vw] max-w-md max-h-[90vh] flex flex-col items-stretch">
-              <div className="flex-1 overflow-y-auto flex flex-col items-center px-4 pt-6 pb-3">
+              <div className="flex-1 overflow-y-auto flex flex-col items-center px-4 pt-6 pb-3" data-scrollable="true">
                 <img
                   src={showItemEffect.imageUrl}
                   alt={showItemEffect.title}
@@ -3606,7 +3620,7 @@ useEffect(() => {
                 </h2>
               </div>
 
-              <div className="flex-1 px-5 py-3 space-y-2 overflow-y-auto">
+              <div className="flex-1 px-5 py-3 space-y-2 overflow-y-auto" data-scrollable="true">
                 {players.map((p, idx) => (
                   idx !== turnIndex && (
                     <button
@@ -3638,42 +3652,42 @@ useEffect(() => {
         )}
 
         {/* ====== 隱藏目標提示 Modal ====== */}
-          {hiddenGoalPopup && (
-            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="w-[420px] bg-slate-900 border-2 border-purple-500 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.6)] p-6">
-                <h2 className="text-xl font-black text-purple-300 mb-3 flex items-center gap-2">
-                  🔓 隱藏目標解鎖
-                </h2>
-                <p className="text-sm text-slate-200 mb-2">
-                  {hiddenGoalPopup.playerName} 已觸發隱藏遊戲目標：
-                </p>
-                <p className="text-lg font-black text-amber-300 mb-3">
-                  【{hiddenGoalPopup.goalTitle}】
-                </p>
-                <p className="text-sm text-slate-300 mb-5">
-                  {hiddenGoalPopup.message}
-                </p>
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setHiddenGoalPopup(null)}
-                    className="px-4 py-1.5 rounded-lg bg-purple-600 text-white text-sm font-bold hover:bg-purple-500"
-                  >
-                    確認
-                  </button>
-                </div>
+        {hiddenGoalPopup && (
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="w-[420px] bg-slate-900 border-2 border-purple-500 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.6)] p-6">
+              <h2 className="text-xl font-black text-purple-300 mb-3 flex items-center gap-2">
+                🔓 隱藏目標解鎖
+              </h2>
+              <p className="text-sm text-slate-200 mb-2">
+                {hiddenGoalPopup.playerName} 已觸發隱藏遊戲目標：
+              </p>
+              <p className="text-lg font-black text-amber-300 mb-3">
+                【{hiddenGoalPopup.goalTitle}】
+              </p>
+              <p className="text-sm text-slate-300 mb-5">
+                {hiddenGoalPopup.message}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setHiddenGoalPopup(null)}
+                  className="px-4 py-1.5 rounded-lg bg-purple-600 text-white text-sm font-bold hover:bg-purple-500"
+                >
+                  確認
+                </button>
               </div>
             </div>
-          )}
-        </div>     
-      </div>        
-    );              
-  }
-
-  return (
-    <PreventPullToRefresh>
-      {content}
-    </PreventPullToRefresh>
+          </div>
+        )}
+      </div>
+    </div>
   );
+}
+
+return (
+  <PreventPullToRefresh>
+    {content}
+  </PreventPullToRefresh>
+);
 }
 
 function StatBar({ label, val, max, color }) {
