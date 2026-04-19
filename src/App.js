@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import PreventPullToRefresh from './PreventPullToRefresh';
 
 const PLAYER_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
 const PLAYER_SHAPES = ['circle', 'triangle', 'square', 'rectangle', 'rhombus', 'trapezoid', 'pentagon', 'octagon'];
@@ -2316,31 +2317,64 @@ const pickBestGoalForAI = useCallback(
 
 const evaluateMoveValue = useCallback(
   (ai, aiGoal) => {
-    let score = 10;
+    let score = 0;
 
-    // 通用基礎：體力高、壓力低、圈數高都略為有利
-    score += (ai.stamina - 50) * 0.5;
-    score -= (ai.stress - 50) * 0.3;
-    score += ai.lap * 0.5;
+    const stamina = ai.stamina ?? 100;
+    const stress = ai.stress ?? 0;
+    const spirit = ai.spirit ?? 80;
+    const wealth = ai.wealth ?? 0;
+    const lap = ai.lap ?? 0;
 
-    if (aiGoal === AI_GOALS.KING_OF_WORK || aiGoal === AI_GOALS.KING_OF_LEISURE) {
-      // 打工皇帝 / King of Leisure：需要跑滿圈數，但又要避免某類格子
-      score += 5;
-    } else if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
-      // 卷王：全程衝 work1
-      score += 10;
-    } else if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
-      // 蛇王：全程衝 work5
-      score += 10;
-    } else if (aiGoal === AI_GOALS.BAD_LUCK_KING) {
-      // 地獄黑仔王：要多事件與多圈，但沒卷王/蛇王那麼刻意衝
-      score += 6;
-    } else if (aiGoal === AI_GOALS.MAD_KING || aiGoal === AI_GOALS.CULT_GOD) {
-      // 瘋王 / 邪教上帝較依賴事件與道具，不特別加跑圈分
-      score -= 3;
-    } else if (aiGoal === AI_GOALS.KING_OF_COMPANY) {
-      // 山大王：股 + 金錢，跑圈略有幫助
-      score += 2;
+    // === 通用：所有目標都需要跑圈 ===
+    // 基礎圈數分：大家都想快點完成遊戲
+    score += lap * 4;              // 每一圈+4，之後再加上目標專屬加成
+
+    // 適度給財力基本價值（所有路線拿錢都有用）
+    score += wealth * 0.0015;      // 每 ~$666 ≈ +1 分
+
+    // === 安全／狀態 ===
+    // 體力太低、壓力太高、精神太低都扣分，避免 AI 把自己玩死
+    if (stamina < 50) {
+      score -= (50 - stamina) * 0.5;
+    }
+    if (stress > 50) {
+      score -= (stress - 50) * 0.4;
+    }
+    if (spirit < 60) {
+      score -= (60 - spirit) * 0.35;
+    }
+
+    // 極端狀態的重罰
+    if (stamina <= 0) score -= 50;
+    if (stress >= 100) score -= 50;
+    if (spirit <= 0) score -= 50;
+
+    // === 目標特化：圈數 vs 金錢 的偏好 ===
+    switch (aiGoal) {
+      case AI_GOALS.KING_OF_WORK:
+      case AI_GOALS.KING_OF_COMPETITION:
+      case AI_GOALS.SLACK_OFF_KING:
+      case AI_GOALS.BAD_LUCK_KING:
+      case AI_GOALS.KING_OF_LEISURE:
+        // 這幾個都是「主要為了衝圈數」
+        score += lap * 4;          // 額外再給一次圈數加成 → 這類 AI 對圈數非常敏感
+        break;
+
+      case AI_GOALS.KING_OF_COMPANY:
+        // 山大王：錢 + 股份，圈數重要但財力權重更高
+        score += lap * 3;          // 圈數略低於衝圈型路線
+        score += wealth * 0.0035;  // 每 ~$285 ≈ +1 分，明顯偏向有錢
+        break;
+
+      case AI_GOALS.MAD_KING:
+      case AI_GOALS.CULT_GOD:
+        // 瘋王 / 邪教上帝：本質還是要跑圈，但更偏向用錢 / 事件堆出結局
+        score += lap * 3.5;        // 比純衝圈略低一點
+        score += wealth * 0.003;   // 顯著強化財力價值
+        break;
+
+      default:
+        break;
     }
 
     return score;
@@ -2726,23 +2760,24 @@ const runAI = useCallback(
     const w5 = updated.work5Count || 0;
     const negEvents = updated.negativeEventsCount || 0;
 
-    // 這裡要用你真實的門檻，暫以 32 次為例（你 check 勝利條件時用的數值）
     const WORK1_TARGET = 32;
     const WORK5_TARGET = 32;
-    const BADLUCK_TARGET = 20; // 例如負面事件 20 次
+    const BADLUCK_TARGET = 20;
 
-    const needWork1Focus = aiGoal === AI_GOALS.KING_OF_COMPETITION && w1 < WORK1_TARGET;
-    const needWork5Focus = aiGoal === AI_GOALS.SLACK_OFF_KING && w5 < WORK5_TARGET;
-    const needBadLuckFocus = aiGoal === AI_GOALS.BAD_LUCK_KING && negEvents < BADLUCK_TARGET;
+    const needWork1Focus =
+      aiGoal === AI_GOALS.KING_OF_COMPETITION && w1 < WORK1_TARGET;
+    const needWork5Focus =
+      aiGoal === AI_GOALS.SLACK_OFF_KING && w5 < WORK5_TARGET;
+    const needBadLuckFocus =
+      aiGoal === AI_GOALS.BAD_LUCK_KING && negEvents < BADLUCK_TARGET;
 
     // 3. 根據目標和體力，決定移動步數（代表性步數 + 評分）
     let steps;
 
     // 3.1 計算最大可行步數（含病假），並設一個硬上限，避免爆計算
-    // 這裡假設最多考慮 30 格（剛好一圈）
     let maxVirtualSteps = getMaxStepsWithSickLeave
       ? getMaxStepsWithSickLeave(updated, 40)
-      : 6; // 如果沒引入該函式，就保守用 6
+      : 6;
     if (!Number.isFinite(maxVirtualSteps) || maxVirtualSteps < 1) {
       maxVirtualSteps = 1;
     }
@@ -2752,8 +2787,8 @@ const runAI = useCallback(
     const candidateSteps = new Set();
     const curPos = updated.pos ?? 0;
 
-    // 永遠考慮 1–6（本地微調，讓 AI 不會太呆）
-    for (let s = 1; s <= Math.min(6, maxConsiderSteps); s++) {
+    // 永遠考慮 1–7（包含第二週第一個假日）
+    for (let s = 1; s <= Math.min(7, maxConsiderSteps); s++) {
       candidateSteps.add(s);
     }
 
@@ -2794,7 +2829,7 @@ const runAI = useCallback(
         foundWork5ForSlack = true;
       }
 
-      // d) King of Leisure：最近的假日（這個本來就是圈王型目標，不需要門檻）
+      // d) King of Leisure：最近的假日（本身就是以休閒為樂）
       if (
         !foundHolidayForLeisure &&
         aiGoal === AI_GOALS.KING_OF_LEISURE &&
@@ -2804,17 +2839,11 @@ const runAI = useCallback(
         foundHolidayForLeisure = true;
       }
 
-      // 卷王 / 蛇王 / King of Leisure 三種特化都找到後，可提早結束掃描
-      if (
-        foundWork1ForComp &&
-        foundWork5ForSlack &&
-        foundHolidayForLeisure
-      ) {
+      if (foundWork1ForComp && foundWork5ForSlack && foundHolidayForLeisure) {
         break;
       }
     }
 
-    // 如果 candidateSteps 竟然是空的，就保底用 1 步
     if (candidateSteps.size === 0) {
       candidateSteps.add(1);
     }
@@ -2824,7 +2853,7 @@ const runAI = useCallback(
     let bestSteps = 1;
 
     for (const s of candidateSteps) {
-      // 簡單模擬走 s 格後的狀態（不需要完整動畫，只估大致狀態）
+      // 簡單模擬走 s 格後的狀態
       let sim = { ...updated };
       let stamina = sim.stamina ?? 100;
       let stress = sim.stress ?? 0;
@@ -2838,12 +2867,10 @@ const runAI = useCallback(
         const cell = BOARD_CELLS[nextPos];
         const cost = cell.cost || 0;
 
-        // 粗略扣體力 / 壓力 / 精神（不模擬放病假細節，避免爆算）
         stamina = clamp(stamina - cost, 0, 100);
         stress = clamp(stress + cost, 0, 100);
         spirit = clamp(spirit - cost, 0, 100);
 
-        // 跨起點加薪
         if (pos !== 0 && nextPos === 0) {
           lap += 1;
           wealth = clamp(wealth + 500, 0, 10000);
@@ -2867,27 +2894,27 @@ const runAI = useCallback(
       const finalCell = BOARD_CELLS[pos];
       const finalCost = finalCell.cost || 0;
 
-      // --- 特化偏好：只在目標未滿足時生效 ---
+      // === 強化特化偏好：只在目標未滿足時生效 ===
 
-      // 卷王：未達成前，落在工作日1 再加分
+      // 卷王：未達成前，落在工作日1 = 超高分
       if (
         needWork1Focus &&
         finalCell.type === 'work' &&
         finalCell.name === '工作日1'
       ) {
-        score += 8; // 可按測試調整
+        score += 40;
       }
 
-      // 蛇王：未達成前，落在工作日5 再加分
+      // 蛇王：未達成前，落在工作日5 = 超高分
       if (
         needWork5Focus &&
         finalCell.type === 'work' &&
         finalCell.name === '工作日5'
       ) {
-        score += 8;
+        score += 40;
       }
 
-      // 地獄黑仔王：未達成前，若落在 cost 5 且卡池負面比例高，給額外加分
+      // 地獄黑仔王：未達成前，落在 cost 5 且負面比例高 = 超高分
       if (needBadLuckFocus && finalCost === 5) {
         let negativeRatio = 0;
 
@@ -2909,14 +2936,19 @@ const runAI = useCallback(
           }
         }
 
-        // 只有當負面比例夠高時，才願意特別衝 cost 5
         if (negativeRatio >= 0.5) {
-          score += 10 * negativeRatio; // 最多大約 +10，可視需要調整
+          score += 50 * negativeRatio;
         }
       }
 
+      // 適度鼓勵走多格：打破只走 1 的情況，但不蓋過特化
+      score += 0.15 * s;
+
+      // 分數高就選；分數幾乎一樣時偏向步數較大的
       if (score > bestScore) {
         bestScore = score;
+        bestSteps = s;
+      } else if (Math.abs(score - bestScore) < 1e-3 && s > bestSteps) {
         bestSteps = s;
       }
     }
@@ -2979,174 +3011,214 @@ useEffect(() => {
   handleRecoveryAndEvent,
 ]);
 
+ let content;
+
   if (gameState === 'setup') {
-  return <SetupScreen onProceed={proceedToNaming} />;
-}
-if (gameState === 'naming') {
-  return (
-    <NamingScreen
-      players={players}
-      setPlayers={setPlayers}
-      onFinalize={finalizeStart}
-    />
-  );
-}
-if (gameState === 'gameover') {
-  return <GameOverScreen players={players} />;
-}
+    content = <SetupScreen onProceed={proceedToNaming} />;
+  } else if (gameState === 'naming') {
+    content = (
+      <NamingScreen
+        players={players}
+        setPlayers={setPlayers}
+        onFinalize={finalizeStart}
+      />
+    );
+  } else if (gameState === 'gameover') {
+    content = <GameOverScreen players={players} />;
+  } else {
+    const currentPlayer = players[turnIndex];
 
-  const currentPlayer = players[turnIndex];
-
-  return (
-    <div className="flex h-screen w-full bg-slate-900 p-4 gap-4 font-sans text-slate-200 overflow-hidden">
-      <div className="w-[380px] flex flex-col gap-4 shrink-0">
-        <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden shadow-2xl relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
-          <h2 className="text-xs font-black text-slate-400 mb-3 uppercase tracking-widest flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="flex items-center gap-2"><span className="w-1.5 h-4 bg-amber-500 rounded-sm"></span> 玩家資訊欄</span>
-            {currentPlayer && !currentPlayer.isFinished && (
-              <span className="text-[10px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded-md border border-emerald-800/50 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                行動中：{currentPlayer.name}
+    content = (
+      <div className="flex h-screen w-full bg-slate-900 p-4 gap-4 font-sans text-slate-200 overflow-hidden">
+        {/* 左側：玩家資訊 + Log */}
+        <div className="w-[380px] flex flex-col gap-4 shrink-0">
+          <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden shadow-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
+            <h2 className="text-xs font-black text-slate-400 mb-3 uppercase tracking-widest flex items-center justify-between border-b border-slate-800 pb-2">
+              <span className="flex items-center gap-2">
+                <span className="w-1.5 h-4 bg-amber-500 rounded-sm"></span>
+                玩家資訊欄
               </span>
-            )}
-          </h2>
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {players.map((p, idx) => (
-              <div 
-  key={p.id} 
-  className={`p-3 rounded-lg border transition-all cursor-pointer hover:ring-2 hover:ring-purple-400 ${idx === turnIndex && !p.isFinished ? 'border-blue-500/80 bg-slate-900 scale-[1.02]' : 'border-slate-800 bg-slate-950 opacity-80'}`}
-  onClick={() => setShowInventory(idx)}
->
-                <div className="flex justify-between items-center mb-3">
-  {/* 左：名字＋標籤 */}
-  <span className="font-black text-sm flex items-center gap-2 text-slate-100">
-    <ShapeSVG color={p.color} shape={p.shape} size={16} />
-    {p.name}
-    {p.isAI && (
-      <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">
-        AI
-      </span>
-    )}
-    {p.isFinished && (
-      <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">
-        完成
-      </span>
-    )}
-  </span>
+              {currentPlayer && !currentPlayer.isFinished && (
+                <span className="text-[10px] bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded-md border border-emerald-800/50 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                  行動中：{currentPlayer.name}
+                </span>
+              )}
+            </h2>
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+              {players.map((p, idx) => (
+                <div 
+                  key={p.id} 
+                  className={`p-3 rounded-lg border transition-all cursor-pointer hover:ring-2 hover:ring-purple-400 ${
+                    idx === turnIndex && !p.isFinished
+                      ? 'border-blue-500/80 bg-slate-900 scale-[1.02]'
+                      : 'border-slate-800 bg-slate-950 opacity-80'
+                  }`}
+                  onClick={() => setShowInventory(idx)}
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    {/* 左：名字＋標籤 */}
+                    <span className="font-black text-sm flex items-center gap-2 text-slate-100">
+                      <ShapeSVG color={p.color} shape={p.shape} size={16} />
+                      {p.name}
+                      {p.isAI && (
+                        <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">
+                          AI
+                        </span>
+                      )}
+                      {p.isFinished && (
+                        <span className="text-[9px] bg-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded ml-1">
+                          完成
+                        </span>
+                      )}
+                    </span>
 
-  {/* 中：目標小方格列 */}
-  <div className="flex-1 flex justify-center gap-1 px-2">
-    {getAvailableGoalsForPlayer(p).map(goal => (
-      <div
-        key={goal.id}
-        className={
-          "w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-black text-slate-900 " +
-          goal.color +
-          " animate-pulse"
-        }
-      >
-        {goal.label}
-      </div>
-    ))}
-  </div>
+                    {/* 中：目標小方格列 */}
+                    <div className="flex-1 flex justify-center gap-1 px-2">
+                      {getAvailableGoalsForPlayer(p).map(goal => (
+                        <div
+                          key={goal.id}
+                          className={
+                            "w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-black text-slate-900 " +
+                            goal.color +
+                            " animate-pulse"
+                          }
+                        >
+                          {goal.label}
+                        </div>
+                      ))}
+                    </div>
 
-  {/* 右：圈數 */}
-  <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
-    {p.lap}/{MAX_LAPS}
-  </span>
-</div>
+                    {/* 右：圈數 */}
+                    <span className="font-black text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                      {p.lap}/{MAX_LAPS}
+                    </span>
+                  </div>
 
-                <div className="space-y-2">
-                  <StatBar label="體力" val={p.stamina} max={100} color="bg-emerald-500" />
-                  <StatBar label="財力" val={p.wealth} max={10000} color="bg-amber-400" />
-                  <StatBar label="壓力" val={p.stress} max={100} color="bg-rose-500" />
-                  <StatBar label="精神" val={p.spirit} max={100} color="bg-cyan-500" />
-                  <StatBar label="信念" val={p.belief} max={100} color="bg-indigo-400" />
+                  <div className="space-y-2">
+                    <StatBar label="體力" val={p.stamina} max={100} color="bg-emerald-500" />
+                    <StatBar label="財力" val={p.wealth} max={10000} color="bg-amber-400" />
+                    <StatBar label="壓力" val={p.stress} max={100} color="bg-rose-500" />
+                    <StatBar label="精神" val={p.spirit} max={100} color="bg-cyan-500" />
+                    <StatBar label="信念" val={p.belief} max={100} color="bg-indigo-400" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="h-[30vh] bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col shadow-2xl relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/50"></div>
-          <div className="flex gap-2 mb-3">
-            <input type="number" min="1" max="24" value={customSteps} onChange={e => setCustomSteps(e.target.value)} disabled={players[turnIndex]?.isAI || isMoving || activeEvent || viewingDeck || players[turnIndex]?.isFinished} className="w-20 bg-slate-900 border border-slate-700 rounded-lg text-center font-black text-xl outline-none focus:border-blue-500 transition-colors text-slate-200" />
-            <button onClick={() => handleMove(customSteps)} disabled={players[turnIndex]?.isAI || isMoving || activeEvent || viewingDeck || players[turnIndex]?.isFinished} className="flex-1 bg-blue-600 text-white font-black text-lg rounded-lg hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-30 tracking-widest">確認行動</button>
-          </div>
-          <div className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-3 overflow-y-auto text-[11px] font-mono text-slate-400 space-y-1.5">
-            {logs.map(l => <div key={l.id} className="border-b border-slate-800/50 pb-1">{l.text}</div>)}
-            <div ref={logEndRef} />
-          </div>
-        </div>
-      </div>
 
-      <div className="flex-1 border border-slate-800 bg-slate-950/50 rounded-xl p-2 flex items-center justify-center overflow-hidden shadow-inner relative">
-        <div
-          className="relative aspect-square grid grid-cols-7 grid-rows-7 gap-2 bg-slate-950 p-2 rounded-2xl border border-slate-800/80"
-          style={{ height: 'min(100%, 90vw)' }}
-        >
-          {BOARD_CELLS.map(cell => (
-            <BoardCell
-              key={cell.id}
-              data={cell}
-              players={players.filter(p => p.pos === cell.id && !p.isFinished)}
-            />
-          ))}
-
-          {/* 中央操作面板 */}
-          <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center gap-4 z-0 relative">
-            {/* 道具卡按鈕 */}
-            <button 
-              onClick={() => {
-                const cp = players[turnIndex];
-                if (cp && !cp.isAI && !isMoving && !activeEvent && !viewingDeck && !cp.isFinished) {
-                  setShowShop(true);
-                } else if (cp && cp.isAI) {
-                  addLog("🤖 AI 無法購買道具卡");
+          <div className="h-[30vh] bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col shadow-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/50"></div>
+            <div className="flex gap-2 mb-3">
+              <input
+                type="number"
+                min="1"
+                max="24"
+                value={customSteps}
+                onChange={e => setCustomSteps(e.target.value)}
+                disabled={
+                  players[turnIndex]?.isAI ||
+                  isMoving ||
+                  activeEvent ||
+                  viewingDeck ||
+                  players[turnIndex]?.isFinished
                 }
-              }}
-              className="group relative w-[18vh] h-[13vh] bg-slate-900 border-2 border-purple-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:scale-105 transition-transform"
-            >
-              <p className="text-[2.2vh] font-black text-purple-300 leading-tight text-center tracking-widest">
-                道具卡
-              </p>
-            </button>
-
-            {/* 事件卡池按鈕 */}
-            <div className="flex gap-8">
+                className="w-20 bg-slate-900 border border-slate-700 rounded-lg text-center font-black text-xl outline-none focus:border-blue-500 transition-colors text-slate-200"
+              />
               <button
-                onClick={() => setViewingDeck('work')}
-                className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-blue-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-105 transition-transform"
+                onClick={() => handleMove(customSteps)}
+                disabled={
+                  players[turnIndex]?.isAI ||
+                  isMoving ||
+                  activeEvent ||
+                  viewingDeck ||
+                  players[turnIndex]?.isFinished
+                }
+                className="flex-1 bg-blue-600 text-white font-black text-lg rounded-lg hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-30 tracking-widest"
               >
-                <div className="absolute top-1 right-2 text-[10px] font-black text-blue-400">
-                  {workDeck.length}/{WORK_POSITIVE_EVENTS.length + WORK_NEGATIVE_EVENTS.length}
-                </div>
-                <p className="text-[2.2vh] font-black text-blue-300 leading-tight text-center tracking-widest">
-                  工作日<br />事件卡
-                </p>
-              </button>
-
-              <button
-                onClick={() => setViewingDeck('holiday')}
-                className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-emerald-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:scale-105 transition-transform"
-              >
-                <div className="absolute top-1 right-2 text-[10px] font-black text-emerald-400">
-                  {holidayDeck.length}/{HOLIDAY_POSITIVE_EVENTS.length + HOLIDAY_NEGATIVE_EVENTS.length}
-                </div>
-                <p className="text-[2.2vh] font-black text-emerald-300 leading-tight text-center tracking-widest">
-                  假日<br />事件卡
-                </p>
+                確認行動
               </button>
             </div>
-
-            <div className="mt-2 text-center select-none pointer-events-none opacity-20">
-              <h2 className="text-[5vh] font-black tracking-[0.2em] text-white">
-                無間輪迴
-              </h2>
+            <div className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-3 overflow-y-auto text-[11px] font-mono text-slate-400 space-y-1.5">
+              {logs.map(l => (
+                <div key={l.id} className="border-b border-slate-800/50 pb-1">
+                  {l.text}
+                </div>
+              ))}
+              <div ref={logEndRef} />
             </div>
           </div>
         </div>
+
+       {/* 右側棋盤、商店等 —— 這裡把你原來的 JSX 全部保留 */}
+<div className="flex-1 border border-slate-800 bg-slate-950/50 rounded-xl p-2 flex items-center justify-center overflow-hidden shadow-inner relative">
+  <div
+    className="relative aspect-square grid grid-cols-7 grid-rows-7 gap-2 bg-slate-950 p-2 rounded-2xl border border-slate-800/80"
+    style={{ height: 'min(100%, 90vw)' }}
+  >
+    {BOARD_CELLS.map(cell => (
+      <BoardCell
+        key={cell.id}
+        data={cell}
+        players={players.filter(p => p.pos === cell.id && !p.isFinished)}
+      />
+    ))}
+
+    {/* ★ 中央操作面板：搬進 grid 裡面，摆在棋盤中央 */}
+    <div className="col-start-2 col-end-7 row-start-2 row-end-7 flex flex-col items-center justify-center gap-4 z-0 relative">
+      {/* 道具卡按鈕 */}
+      <button 
+        onClick={() => {
+          const cp = players[turnIndex];
+          if (cp && !cp.isAI && !isMoving && !activeEvent && !viewingDeck && !cp.isFinished) {
+            setShowShop(true);
+          } else if (cp && cp.isAI) {
+            addLog("🤖 AI 無法購買道具卡");
+          }
+        }}
+        className="group relative w-[18vh] h-[13vh] bg-slate-900 border-2 border-purple-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:scale-105 transition-transform"
+      >
+        <p className="text-[2.2vh] font-black text-purple-300 leading-tight text-center tracking-widest">
+          道具卡
+        </p>
+      </button>
+
+      {/* 事件卡池按鈕 */}
+      <div className="flex gap-8">
+        <button
+          onClick={() => setViewingDeck('work')}
+          className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-blue-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:scale-105 transition-transform"
+        >
+          <div className="absolute top-1 right-2 text-[10px] font-black text-blue-400">
+            {workDeck.length}/{WORK_POSITIVE_EVENTS.length + WORK_NEGATIVE_EVENTS.length}
+          </div>
+          <p className="text-[2.2vh] font-black text-blue-300 leading-tight text-center tracking-widest">
+            工作日<br />事件卡
+          </p>
+        </button>
+
+        <button
+          onClick={() => setViewingDeck('holiday')}
+          className="group relative w-[13vh] h-[18vh] bg-slate-900 border-2 border-emerald-500/50 rounded-xl flex flex-col items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:scale-105 transition-transform"
+        >
+          <div className="absolute top-1 right-2 text-[10px] font-black text-emerald-400">
+            {holidayDeck.length}/{HOLIDAY_POSITIVE_EVENTS.length + HOLIDAY_NEGATIVE_EVENTS.length}
+          </div>
+          <p className="text-[2.2vh] font-black text-emerald-300 leading-tight text-center tracking-widest">
+            假日<br />事件卡
+          </p>
+        </button>
+      </div>
+
+      <div className="mt-2 text-center select-none pointer-events-none opacity-20">
+        <h2 className="text-[5vh] font-black tracking-[0.2em] text-white">
+          無間輪迴
+        </h2>
+      </div>
+    </div>
+    {/* ★ 中央操作面板結束 */}
+  </div>
 
         {/* ====== 留言板 Icon（右下角） ====== */}
         <div className="absolute bottom-4 right-4 z-40">
@@ -3566,34 +3638,41 @@ if (gameState === 'gameover') {
         )}
 
         {/* ====== 隱藏目標提示 Modal ====== */}
-        {hiddenGoalPopup && (
-          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="w-[420px] bg-slate-900 border-2 border-purple-500 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.6)] p-6">
-              <h2 className="text-xl font-black text-purple-300 mb-3 flex items-center gap-2">
-                🔓 隱藏目標解鎖
-              </h2>
-              <p className="text-sm text-slate-200 mb-2">
-                {hiddenGoalPopup.playerName} 已觸發隱藏遊戲目標：
-              </p>
-              <p className="text-lg font-black text-amber-300 mb-3">
-                【{hiddenGoalPopup.goalTitle}】
-              </p>
-              <p className="text-sm text-slate-300 mb-5">
-                {hiddenGoalPopup.message}
-              </p>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setHiddenGoalPopup(null)}
-                  className="px-4 py-1.5 rounded-lg bg-purple-600 text-white text-sm font-bold hover:bg-purple-500"
-                >
-                  確認
-                </button>
+          {hiddenGoalPopup && (
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="w-[420px] bg-slate-900 border-2 border-purple-500 rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.6)] p-6">
+                <h2 className="text-xl font-black text-purple-300 mb-3 flex items-center gap-2">
+                  🔓 隱藏目標解鎖
+                </h2>
+                <p className="text-sm text-slate-200 mb-2">
+                  {hiddenGoalPopup.playerName} 已觸發隱藏遊戲目標：
+                </p>
+                <p className="text-lg font-black text-amber-300 mb-3">
+                  【{hiddenGoalPopup.goalTitle}】
+                </p>
+                <p className="text-sm text-slate-300 mb-5">
+                  {hiddenGoalPopup.message}
+                </p>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setHiddenGoalPopup(null)}
+                    className="px-4 py-1.5 rounded-lg bg-purple-600 text-white text-sm font-bold hover:bg-purple-500"
+                  >
+                    確認
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+        </div>     
+      </div>        
+    );              
+  }
+
+  return (
+    <PreventPullToRefresh>
+      {content}
+    </PreventPullToRefresh>
   );
 }
 
