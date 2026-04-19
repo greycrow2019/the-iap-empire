@@ -3705,7 +3705,7 @@ function SetupScreen({ onProceed }) {
             <li><span className="text-emerald-400 font-bold"> 📆行動與消耗：</span>1. 玩家可以自由選擇移動距離，經過「起點」可領薪 $500。經過「工作日」會消耗該格相應的體力、精神及增加壓力，停留在工作日格時則按其標示增加負面事件卡的百分比機率；停留在「假日」則可恢復10點體力及精神與減少10點壓力。2. 每次經過棋盤的「工作日5」，都必須繳納一週的固定開支 $50。3. 當停留在工作日或假日時會觸發相應隨機事件卡抽取。4. 遊戲最大圈數為24，玩家需在24個圈內爭取完成任一遊戲目標，若走完24圈都未能完成則失去資格。5. 當有玩家達成任一遊戲目標或全部玩家都走完24圈時，遊戲結束。</li>
             <li><span className="text-emerald-400 font-bold">🛍️ 道具卡：</span>玩家可以在自己回合內點擊道具卡區購買道具卡，點擊自己的玩家資訊欄查看及使用已購買的道具卡。每回合只能使用一次且使用後會在原地停留。</li>
                         <li><span className="text-rose-400 font-bold">⚠️ 數值預警：</span>1. 當玩家「壓力 {'>'} 80」或「精神 {'<'} 20」時，抽中<span className="text-rose-400">負面事件</span>的機率將會飆升！2. 當玩家信念低於30時，隨機事件的負面效果加倍，大於70時則減半。</li>
-            <li><span className="text-indigo-400 font-bold">🚑 社會救濟金：</span>體力透支時可花相應體力的10倍財力強行移動 1 格；若財力不足以支付強行移動或每週開支，將強制遣返起點獲社會救濟 $500且圈數+1。</li>
+            <li><span className="text-indigo-400 font-bold">🚑 社會救濟金：</span>體力不足以移動時可花費相應格子體力消耗的40倍財力強行移動；若財力不足以支付強行移動或每週開支，將強制遣返起點獲社會救濟 $500且圈數+1。</li>
           </ul>
 
           <h3 className="text-blue-400 font-black text-sm mb-3 tracking-widest border-b border-slate-800 pb-2">🏆 勝利條件</h3>
