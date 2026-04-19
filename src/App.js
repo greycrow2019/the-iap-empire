@@ -82,19 +82,19 @@ const WORK_NEGATIVE_EVENTS = [
 ];
 
 const HOLIDAY_POSITIVE_EVENTS = [
-  { id: 'h2', title: "朋友約唱 KTV 到深夜", desc: "和老朋友唱歌唱到很開心，但很累。", effect: { spirit: 12, belief: 6, stamina: -9, stress: -7 } },
-  { id: 'h4', title: "商場活動抽中旅行券", desc: "幸運抽到周末小旅行券，價值不菲。", effect: { wealth: 180, spirit: 11, belief: 5, stamina: 7 } },
+  { id: 'h2', title: "朋友約唱 KTV 到深夜", desc: "和老朋友唱歌唱到很開心，但很累。", effect: { wealth: -50, spirit: 12, belief: 6, stamina: -9, stress: -7 } },
+  { id: 'h4', title: "商場活動抽中旅行券", desc: "幸運抽到周末小旅行券，價值不菲。", effect: { wealth: 180, spirit: 11, belief: 3, stamina: 7 } },
   { id: 'h6', title: "公園野餐日", desc: "天氣很好，和朋友去公園野餐聊天。", effect: { stress: -10, spirit: 11, stamina: 8 } },
-  { id: 'h8', title: "小賭怡情", desc: "賭運不錯，贏取小獎金。", effect: { wealth: 140, spirit: 10 } },
+  { id: 'h8', title: "小賭怡情", desc: "賭運不錯，贏取小獎金。", effect: { wealth: 140, spirit: 10, belief: -8 } },
   { id: 'h9', title: "假日下大雨宅在家", desc: "原本想出門，結果只能在家追劇放空。", effect: { stamina: 9, stress: -7, spirit: 8 } },
-  { id: 'h11', title: "朋友終於還錢", desc: "之前借出去的錢，對方今天全部還清。", effect: { wealth: 170, stress: -6, belief: 5 } },
+  { id: 'h11', title: "朋友終於還錢", desc: "之前借出去的錢，對方今天全部還清。", effect: { wealth: 170, stress: -6, belief: 3 } },
   { id: 'h12', title: "搶到偶像演唱會門票", desc: "成功搶到票，但票價很貴。", effect: { spirit: 14, wealth: -150 } },
   { id: 'h13', title: "商場免費停車優惠", desc: "拿到免費停車券，省下一筆停車費。", effect: { wealth: 70, stress: -4 } },
   { id: 'h14', title: "海邊一日遊", desc: "去海邊玩水、曬太陽，徹底放鬆。", effect: { stress: -12, spirit: 13, stamina: 10 } },
-  { id: 'h16', title: "夜市大吃掃街", desc: "去夜市吃到很滿足，但撐壞了。", effect: { spirit: 9, stamina: -6, wealth: -80 } },
-  { id: 'h17', title: "收到遠方親戚禮物", desc: "意外收到實用又值錢的假日禮物。", effect: { spirit: 10, wealth: 120 } },
-  { id: 'h19', title: "在家徹底放空一天", desc: "什麼都不做，睡大覺、滑手機。", effect: { stamina: 13, stress: -11, spirit: 9 } },
-  { id: 'h20', title: "逛街抽獎中大獎", desc: "假日參加抽獎，運氣爆棚抽到不錯獎品。", effect: { wealth: 280, spirit: 12 } },
+  { id: 'h16', title: "夜市大吃掃街", desc: "去夜市吃到很滿足，但撐壞了。", effect: { spirit: 9, stamina: -6, wealth: -80, belief: -5 } },
+  { id: 'h17', title: "收到遠方親戚禮物", desc: "意外收到實用又值錢的假日禮物。", effect: { spirit: 10, wealth: 120, belief: 2 } },
+  { id: 'h19', title: "在家徹底放空一天", desc: "什麼都不做，睡大覺、滑手機。", effect: { stamina: 13, stress: -11, spirit: 9, belief: -5 } },
+  { id: 'h20', title: "逛街抽獎中大獎", desc: "假日參加抽獎，運氣爆棚抽到不錯獎品。", effect: { wealth: 280, spirit: 12, belief: -10 } },
   { id: 'h21', title: "宗教宣傳", desc: "假日被邀請參加宗教分享會，感到莫名平靜。", effect: { belief: 10, stamina: -20, stress: -20, spirit: 20 } }
 ];
 
@@ -102,10 +102,10 @@ const HOLIDAY_NEGATIVE_EVENTS = [
   { id: 'h1', title: "家人要求大掃除", desc: "本想睡懶覺，結果被拉起來大掃除一整天。", effect: { stamina: -10, stress: 5, spirit: -6 } },
   { id: 'h3', title: "去看熱門電影", desc: "買票、爆米花、飲料，享受大銀幕時光。", effect: { spirit: 10, stress: -8, wealth: -90 } },
   { id: 'h5', title: "家庭大聚餐", desc: "全家人聚餐，你被推出來負責買單。", effect: { wealth: -380, spirit: 10, belief: -5 } },
-  { id: 'h7', title: "假日網購衝動消費", desc: "滑手機不小心買了一堆東西。", effect: { wealth: -320, spirit: 7, stress: 4, belief: -4 } },
+  { id: 'h7', title: "假日網購衝動消費", desc: "滑手機不小心買了一堆東西。", effect: { wealth: -320, spirit: 7, stress: 4, belief: -10 } },
   { id: 'h10', title: "登山健行扭傷", desc: "去爬山欣賞風景，不小心扭到腳。", effect: { stamina: -13, spirit: -5 } },
-  { id: 'h15', title: "寵物突然生病", desc: "假日帶寵物看獸醫，花了不少錢。", effect: { wealth: -420, stress: 8, spirit: -10, belief: -6 } },
-  { id: 'h18', title: "衝動辦健身房年卡", desc: "看到促銷，一時衝動辦了昂貴年卡。", effect: { wealth: -480, stress: 5, belief: -6 } }
+  { id: 'h15', title: "寵物突然生病", desc: "假日帶寵物看獸醫，花了不少錢。", effect: { wealth: -420, stress: 8, spirit: -10, belief: -8 } },
+  { id: 'h18', title: "衝動辦健身房年卡", desc: "看到促銷，一時衝動辦了昂貴年卡。", effect: { wealth: -480, stress: 5, belief: -12 } }
 ];
 
 // ==================== 道具卡資料（新增四種道具） ====================
@@ -113,7 +113,7 @@ const ITEM_DATA = [
   {
     id: 'overtime',
     title: '<連續通宵趕project>',
-    price: 1000,
+    price: 500,
     desc: '使用後直接移至下一個工作日5。',
     imageUrl: process.env.PUBLIC_URL + '/picture/overtime.png',
     target: 'next_work5'
@@ -121,7 +121,7 @@ const ITEM_DATA = [
   {
     id: 'companyhome',
     title: '<公司是我家>',
-    price: 2000,
+    price: 1000,
     desc: '使用後直接傳送至第一個工作日1，並強制視為經過起點。若已在此位置則無法使用。',
     imageUrl: process.env.PUBLIC_URL + '/picture/companyhome.png',
     target: 'first_work1'
@@ -129,7 +129,7 @@ const ITEM_DATA = [
   {
     id: 'shorttrip',
     title: '<短trip旅行>',
-    price: 1000,
+    price: 500,
     desc: '使用後直接移至下一個假日格。',
     imageUrl: process.env.PUBLIC_URL + '/picture/shorttrip.png',
     target: 'next_holiday'
@@ -137,7 +137,7 @@ const ITEM_DATA = [
   {
     id: 'longholiday',
     title: '<長假享受人生>',
-    price: 2000,
+    price: 1000,
     desc: '使用後直接傳送至假日1。若已在此位置則無法使用。',
     imageUrl: process.env.PUBLIC_URL + '/picture/longholiday.png',
     target: 'holiday1'
@@ -199,13 +199,29 @@ const ITEM_DATA = [
     requiresTarget: false
   },
   {
-    id: 'reportall',
-    title: '<報串>',
-    price: 3000,
-    desc: '全面威脅舉報所有人：其他所有玩家財力 -500；特定玩家則再額外 -1500，然後全部轉移到自己身上。',
-    imageUrl: process.env.PUBLIC_URL + '/picture/reportall.png',
-    requiresTarget: false,
-  },
+  id: 'phonefraud',
+  title: '<電話詐騙>',
+  price: 3000,
+  desc: '騙走對方持有的公司10%股份，或者最多2000財力。',
+  imageUrl: process.env.PUBLIC_URL + '/picture/phonefraud.png',
+  requiresTarget: true,
+},
+{
+  id: 'reportall',
+  title: '<報串>',
+  price: 3000,
+  desc: '全面威脅舉報所有人：其他所有玩家財力 -500；特定玩家則再額外 -1500，然後全部轉移到自己身上。',
+  imageUrl: process.env.PUBLIC_URL + '/picture/reportall.png',
+  requiresTarget: false,
+},
+{
+  id: 'blessing',
+  title: '<祈福三寶>',
+  price: 500,
+  desc: '暫時提升信念 40，持續一圈，期間所有負面事件的打擊都會減輕。',
+  imageUrl: process.env.PUBLIC_URL + '/picture/blessing.png',
+  requiresTarget: false,
+},
 ];
 
 // 給道具卡用的目標格計算函式
@@ -294,54 +310,178 @@ export default function App() {
   // { playerIndex, source: 'move' | 'item' | 'subsidy', ts }
   const [pendingRecovery, setPendingRecovery] = useState(null);
 
+  // ★ 留言板相關 state
+  const [messages, setMessages] = useState([]);         // [{ id, text, senderId, createdAt, readBy: [playerId...] }]
+  const [showMessageBoard, setShowMessageBoard] = useState(false);
+
   const logEndRef = useRef(null);
 
   const addLog = useCallback((msg) => {
-  setLogs(prev => {
-    const last = prev[prev.length - 1];
-    if (last && last.text === msg) {
-      return prev;
-    }
-    return [...prev, { id: Date.now() + Math.random(), text: msg }];
-  });
-}, [setLogs]);
+    setLogs(prev => {
+      const last = prev[prev.length - 1];
+      if (last && last.text === msg) {
+        return prev;
+      }
+      return [...prev, { id: Date.now() + Math.random(), text: msg }];
+    });
+  }, [setLogs]);
+
+  // ★ 留言板 helper：依照目前玩家列表，取得所有玩家 id
+  const allPlayerIds = useMemo(() => players.map(p => p.id), [players]);
+
+  // 新增留言
+  const addMessage = useCallback((text, senderId) => {
+    setMessages(prev => [
+      ...prev,
+      {
+        id: Date.now() + Math.random(),
+        text,
+        senderId,
+        createdAt: new Date().toISOString(),
+        readBy: [senderId], // 發送者自己算已讀
+      },
+    ]);
+  }, []);
+
+  // 某玩家打開留言板時，將所有訊息標記為該玩家已讀
+  const markAllMessagesReadBy = useCallback((playerId) => {
+    setMessages(prev =>
+      prev.map(m =>
+        m.readBy.includes(playerId)
+          ? m
+          : { ...m, readBy: [...m.readBy, playerId] }
+      )
+    );
+  }, []);
+
+  // 是否存在「尚未被所有玩家讀取」的訊息 → 用來顯示紅點
+  const hasUnreadForAnyPlayer = useMemo(() => {
+    if (messages.length === 0 || allPlayerIds.length === 0) return false;
+    return messages.some(m =>
+      allPlayerIds.some(pid => !m.readBy.includes(pid))
+    );
+  }, [messages, allPlayerIds]);
+
+  // ★ 通用極端目標進度提示 helper
+  // 用於在達成門檻的 1/4、1/2、3/4 時發出一次性提示 log
+  const notifyGoalProgress = useCallback((player, opts) => {
+    const {
+      current,      // 目前次數
+      target,       // 門檻，例如 32 / 20 / 10
+      title,        // 目標名稱（顯示用）
+      field25,      // flag 欄位名稱（字串），例如 "kingOfCompetitionNotified25"
+      field50,
+      field75,
+    } = opts;
+
+    if (player.victoryTitle) return; // 已達成極端成就就不再提示
+
+    const thresholds = [
+      { ratio: 0.25, field: field25, label: '1/4' },
+      { ratio: 0.5,  field: field50, label: '1/2' },
+      { ratio: 0.75, field: field75, label: '3/4' },
+    ];
+
+    thresholds.forEach(t => {
+      const needed = Math.ceil(target * t.ratio);
+      if (current >= needed && !player[t.field]) {
+        addLog(`📢 ${player.name} 在目標【${title}】的達成進度已達 ${t.label}！ (${current}/${target})`);
+        // 這裡不直接 setPlayers，而是交給呼叫端在同一個 setPlayers callback 中設定 flag
+        player[t.field] = true;
+      }
+    });
+  }, [addLog]);
 
   const proceedToNaming = (humans, ais) => {
     const initialPlayers = [];
     let colorIdx = 0;
-    for (let i = 0; i < humans; i++) initialPlayers.push({ id: `p${i}`, name: `玩家 ${i + 1}`, isAI: false, color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length], shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length] });
-    for (let i = 0; i < ais; i++) initialPlayers.push({ id: `ai${i}`, name: `AI ${i + 1}`, isAI: true, color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length], shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length] });
+    for (let i = 0; i < humans; i++) {
+      initialPlayers.push({
+        id: `p${i}`,
+        name: `玩家 ${i + 1}`,
+        isAI: false,
+        color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
+        shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length],
+      });
+    }
+    for (let i = 0; i < ais; i++) {
+      initialPlayers.push({
+        id: `ai${i}`,
+        name: `AI ${i + 1}`,
+        isAI: true,
+        color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
+        shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length],
+      });
+    }
     setPlayers(initialPlayers);
     setGameState('naming');
   };
 
   const finalizeStart = () => {
-  setPlayers(prev => prev.map(p => ({ 
-    ...p, 
-    pos: 0, 
-    lap: 0, 
-    isFinished: false, 
-    stamina: 100, 
-    wealth: 1500, 
-    stress: 0, 
-    spirit: 80, 
-    belief: 30,
-    hasLandedOnWork: false, 
-    hasLandedOnHoliday: false, 
-    victoryTitle: null,
-    items: [],
-    longInvestmentBonus: 0,
-    hasUsedWeed: false,        // ★ 新增：是否使用過大麻
-    work1Count: 0,
-    work2Count: 0,
-    work3Count: 0,
-    work4Count: 0,
-    work5Count: 0,
-    negativeEventsCount: 0,
-    hasPositiveOnWork1: false,
-    lastPlannedStopCellIndex: null,
-    skipCellResolveOnce: false,
-  })));
+  setPlayers(prev =>
+    prev.map(p => ({ 
+      ...p, 
+      pos: 0, 
+      lap: 0, 
+      isFinished: false, 
+      stamina: 100, 
+      wealth: 1500, 
+      stress: 0, 
+      spirit: 80, 
+      belief: 30,
+      hasLandedOnWork: false, 
+      hasLandedOnHoliday: false, 
+      victoryTitle: null,
+      items: [],
+      longInvestmentBonus: 0,
+      hasUsedWeed: false,        // 是否使用過大麻
+      work1Count: 0,
+      work2Count: 0,
+      work3Count: 0,
+      work4Count: 0,
+      work5Count: 0,
+      negativeEventsCount: 0,
+      hasPositiveOnWork1: false,
+      lastPlannedStopCellIndex: null,
+      skipCellResolveOnce: false,
+
+      // 祈福三寶相關欄位
+      blessingBonus: 0,
+      blessingExpireLap: null,
+
+      // ★ 地獄黑仔王：在工作日1 抽到負面事件的次數
+      badLuckOnWork1Count: 0,
+
+      // ★ 第 8 部分：極端目標進度提示旗標（1/4, 1/2, 3/4）
+      // 卷王（work1 >= 32）
+      kingOfCompetitionNotified25: false,
+      kingOfCompetitionNotified50: false,
+      kingOfCompetitionNotified75: false,
+
+      // 蛇王（work5 >= 32）
+      slackOffKingNotified25: false,
+      slackOffKingNotified50: false,
+      slackOffKingNotified75: false,
+
+      // 地獄黑仔王（負面事件 >= 20，及工作日1負面次數）
+      badLuckKingNotified25: false,
+      badLuckKingNotified50: false,
+      badLuckKingNotified75: false,
+      badLuckKingNotified25_Work1: false,
+      badLuckKingNotified50_Work1: false,
+      badLuckKingNotified75_Work1: false,
+
+      // 瘋王（大麻次數 >= 10）
+      madKingNotified25: false,
+      madKingNotified50: false,
+      madKingNotified75: false,
+
+      // 邪教上帝（奉獻次數 >= 10）
+      cultGodNotified25: false,
+      cultGodNotified50: false,
+      cultGodNotified75: false,
+    }))
+  );
 
   const allWorkEvents = [...WORK_POSITIVE_EVENTS, ...WORK_NEGATIVE_EVENTS];
   const allHolidayEvents = [...HOLIDAY_POSITIVE_EVENTS, ...HOLIDAY_NEGATIVE_EVENTS];
@@ -350,36 +490,83 @@ export default function App() {
   setHolidayDeck(shuffleDeck(allHolidayEvents));
 
   setGameState('playing');
-  addLog("系統初始化完成，踏入無間輪迴。");
+  addLog("職場煉獄準備完畢，踏入無間輪迴。");
 };
 
-  const checkMoveFeasibility = (player, steps) => {
+  // 體力檢查：精準模擬是否能靠體力走 steps 格
+const checkMoveFeasibility = useCallback(
+  (player, steps) => {
     let { stamina, pos } = player;
     for (let i = 1; i <= steps; i++) {
       const nextPos = (pos + i) % TOTAL_CELLS;
-      const cost = BOARD_CELLS[nextPos].cost;
+      const cost = BOARD_CELLS[nextPos].cost || 0;
       if (stamina < cost) return { possible: false, reason: '體力透支' };
       stamina -= cost;
     }
     return { possible: true };
-  };
+  },
+  [] // BOARD_CELLS / TOTAL_CELLS 若是 const，不會變，可留空依賴
+);
 
-const getMaxFeasibleSteps = (player, maxSteps) => {
-  let { stamina, pos } = player;
-  let maxReachable = 0;
+// 純體力情況下，最多可以走幾格
+const getMaxFeasibleSteps = useCallback(
+  (player, maxSteps) => {
+    let { stamina, pos } = player;
+    let maxReachable = 0;
 
-  for (let i = 1; i <= maxSteps; i++) {
-    const nextPos = (pos + i) % TOTAL_CELLS;
-    const cost = BOARD_CELLS[nextPos].cost;
+    for (let i = 1; i <= maxSteps; i++) {
+      const nextPos = (pos + i) % TOTAL_CELLS;
+      const cost = BOARD_CELLS[nextPos].cost || 0;
+      if (stamina < cost) break;
+      stamina -= cost;
+      maxReachable = i;
+    }
 
-    if (stamina < cost) break;
+    return maxReachable;
+  },
+  []
+);
 
-    stamina -= cost;
-    maxReachable = i;
-  }
+// 體力 + 放病假（40 倍財力）的精準模擬：最多能走幾格
+const getMaxStepsWithSickLeave = useCallback(
+  (player, maxSteps) => {
+    let tempStamina = player.stamina;
+    let tempWealth = player.wealth;
+    let pos = player.pos;
+    let maxReachable = 0;
 
-  return maxReachable;
-};
+    for (let i = 1; i <= maxSteps; i++) {
+      const nextPos = (pos + i) % TOTAL_CELLS;
+      const cell = BOARD_CELLS[nextPos];
+      const cost = cell.cost || 0;
+
+      if (cost === 0) {
+        // 假日或不消耗體力的格子 → 免費走
+        maxReachable = i;
+        continue;
+      }
+
+      if (tempStamina >= cost) {
+        // 體力足夠 → 正常扣體力
+        tempStamina -= cost;
+        maxReachable = i;
+      } else {
+        // 體力不足 → 嘗試放病假（40 倍財力）
+        const sickLeaveCost = cost * 40;
+        if (tempWealth >= sickLeaveCost) {
+          tempWealth -= sickLeaveCost;
+          maxReachable = i;
+        } else {
+          // 體力與財力都不足以跨過這一格 → 停止模擬
+          break;
+        }
+      }
+    }
+
+    return maxReachable;
+  },
+  []
+);
 
 // ★★★ 這裡開始貼 GOAL_ICONS + getAvailableGoalsForPlayer ★★★
   const GOAL_ICONS = [
@@ -474,6 +661,82 @@ const getMaxFeasibleSteps = (player, maxSteps) => {
     return result;
   };
 
+// ★ 依據 getAvailableGoalsForPlayer：判斷玩家是否仍有機會追某個目標
+  const canStillPursueGoal = useCallback((p, goalId) => {
+    if (p.victoryTitle) return false;
+
+    // 打工皇帝
+    if (goalId === '打工皇帝') {
+      return !p.hasLandedOnHoliday;
+    }
+
+    // King of Leisure
+    if (goalId === 'King of Leisure') {
+      return !p.hasLandedOnWork;
+    }
+
+    // 山大王
+    if (goalId === '山大王') {
+      const shareCount = (p.items || []).filter(it => it.id === 'companyshare').length;
+      const totalOthersShare = players
+        .filter(other => other.id !== p.id)
+        .reduce((sum, other) => {
+          const c = (other.items || []).filter(it => it.id === 'companyshare').length;
+          return sum + c;
+        }, 0);
+      return shareCount < 6 && totalOthersShare <= 4;
+    }
+
+    const work1 = p.work1Count || 0;
+    const work2 = p.work2Count || 0;
+    const work3 = p.work3Count || 0;
+    const work4 = p.work4Count || 0;
+    const work5 = p.work5Count || 0;
+    const hasPositiveOnWork1 = !!p.hasPositiveOnWork1;
+
+    // 卷王：只踩 work1
+    if (goalId === '卷王') {
+      const onlyWork1 =
+        work2 === 0 &&
+        work3 === 0 &&
+        work4 === 0 &&
+        work5 === 0;
+      return onlyWork1;
+    }
+
+    // 蛇王：只踩 work5
+    if (goalId === '蛇王') {
+      const onlyWork5 =
+        work1 === 0 &&
+        work2 === 0 &&
+        work3 === 0 &&
+        work4 === 0;
+      return onlyWork5;
+    }
+
+    // 地獄黑仔王：還沒在工作日1翻盤
+    if (goalId === '地獄黑仔王') {
+      return !hasPositiveOnWork1;
+    }
+
+    // 瘋王：已解鎖瘋王路線，且還沒累積到 10 次
+    if (goalId === '瘋王') {
+      const madUnlocked = !!p.hasUnlockedMadKing;
+      const madWeedCount = p.madKingWeedCountAfterUnlock || 0;
+      return madUnlocked && madWeedCount < 10;
+    }
+
+    // 邪教上帝：已解鎖，且奉獻 <10 或信念 <100
+    if (goalId === '邪教上帝') {
+      const cultUnlocked = !!p.hasUnlockedCultGod;
+      const donationCount = p.donationUseCount || 0;
+      const belief = p.belief || 0;
+      return cultUnlocked && (donationCount < 10 || belief < 100);
+    }
+
+    return false;
+  }, [players]);
+
 const drawCard = useCallback((isWork, cellCost = 0) => {
   const currentPlayer = players[turnIndex];
   const isHighStress = currentPlayer.stress > 80;
@@ -540,6 +803,21 @@ const drawCard = useCallback((isWork, cellCost = 0) => {
 
   return card;
 }, [players, turnIndex, workDeck, holidayDeck, addLog, setWorkDeck, setHolidayDeck]);
+
+// ✅ 新增：判斷事件卡正負的小工具函式（放在這裡沒問題）
+const getEventPolarity = useCallback((event) => {
+  const id = event?.id;
+  if (!id) return 'neutral';
+
+  const isWorkPositive = WORK_POSITIVE_EVENTS.some(e => e.id === id);
+  const isWorkNegative = WORK_NEGATIVE_EVENTS.some(e => e.id === id);
+  const isHolidayPositive = HOLIDAY_POSITIVE_EVENTS.some(e => e.id === id);
+  const isHolidayNegative = HOLIDAY_NEGATIVE_EVENTS.some(e => e.id === id);
+
+  if (isWorkPositive || isHolidayPositive) return 'positive';
+  if (isWorkNegative || isHolidayNegative) return 'negative';
+  return 'neutral';
+}, []);
 
 const handleBuyItem = useCallback(
   (item, quantity) => {
@@ -618,127 +896,176 @@ const handleBuyItem = useCallback(
     }
 
     // 傳送類道具
-if (itemToUse.target) {
-  const targetPos = getTargetPosition(player.pos, itemToUse.target);
+    if (itemToUse.target) {
+      const targetPos = getTargetPosition(player.pos, itemToUse.target);
 
-  if (targetPos === player.pos) {
-    addLog(
-      `⛔ ${player.name} 已經位於目標位置，無法使用「${itemToUse.title}」`
-    );
-    return;
-  }
-
-  // 先移除道具
-  setPlayers(prev => {
-    const next = [...prev];
-    const p = { ...next[playerIdx] };
-    p.items = p.items.filter((_, i) => i !== itemIdx);
-    next[playerIdx] = p;
-    return next;
-  });
-
-  addLog(`🔮 ${player.name} 使用了「${itemToUse.title}」！`);
-
-  // 傳送 + 經過起點 / 長線投資加成
-  setPlayers(prev => {
-    const next = [...prev];
-    const p = { ...next[playerIdx] };
-
-    const fromPos = p.pos;
-    p.pos = targetPos;
-
-    // 公司是我家：強制經過起點
-    if (itemToUse.target === 'first_work1') {
-      const willFinish = p.lap + 1 >= MAX_LAPS;
-
-      p.lap += 1;
-      p.wealth = clamp(p.wealth + 500, 0, 10000);
-      if (p.longInvestmentBonus > 0) {
-        p.wealth = clamp(
-          p.wealth + p.longInvestmentBonus,
-          0,
-          10000
+      if (targetPos === player.pos) {
+        addLog(
+          `⛔ ${player.name} 已經位於目標位置，無法使用「${itemToUse.title}」`
         );
+        return;
       }
 
-      if (willFinish) {
-        p.skipCellResolveOnce = true;
-      }
+      // 先移除道具
+      setPlayers(prev => {
+        const next = [...prev];
+        const p = { ...next[playerIdx] };
+        p.items = p.items.filter((_, i) => i !== itemIdx);
+        next[playerIdx] = p;
+        return next;
+      });
 
-      addLog(
-        `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $500${
-          p.longInvestmentBonus > 0
-            ? `（長線投資 +${p.longInvestmentBonus}）`
-            : ''
-        }`
-      );
-    }
+      addLog(`🔮 ${player.name} 使用了「${itemToUse.title}」！`);
 
-    // overtime：特殊情況「起點前 work5 → 起點後第一個 work5」並完成最後一圈，只當繞圈，不結算目標格
-    if (itemToUse.target === 'nextwork5') {
-      const lastWork5Index = 29;  // 起點前最後一格工作日5
-      const firstWork5Index = 6;  // 起點後第一格工作日5
+      // 傳送 + 經過起點 / 長線投資加成
+      setPlayers(prev => {
+        const next = [...prev];
+        const p = { ...next[playerIdx] };
 
-      const willJumpFromLastToFirst5 =
-        fromPos === lastWork5Index && targetPos === firstWork5Index;
+        const fromPos = p.pos;
+        p.pos = targetPos;
 
-      const willFinishByThisJump =
-        willJumpFromLastToFirst5 && p.lap + 1 >= MAX_LAPS;
+        // 公司是我家：強制經過起點
+        if (itemToUse.target === 'first_work1') {
+          const willFinish = p.lap + 1 >= MAX_LAPS;
 
-      if (willFinishByThisJump) {
-        p.lap += 1;
-        p.wealth = clamp(p.wealth + 500, 0, 10000);
-        if (p.longInvestmentBonus > 0) {
-          p.wealth = clamp(
-            p.wealth + p.longInvestmentBonus,
-            0,
-            10000
+          p.lap += 1;
+          p.wealth = clamp(p.wealth + 500, 0, 10000);
+          if (p.longInvestmentBonus > 0) {
+            p.wealth = clamp(
+              p.wealth + p.longInvestmentBonus,
+              0,
+              10000
+            );
+          }
+
+          // ✅ 跨起點時檢查祈福是否到期
+          if (
+            p.blessingBonus &&
+            p.blessingBonus > 0 &&
+            p.blessingExpireLap === p.lap
+          ) {
+            p.belief = clamp(p.belief - p.blessingBonus, 0, 100);
+            addLog(`${p.name} 的祈福效果已結束，信念恢復正常。`);
+            p.blessingBonus = 0;
+            p.blessingExpireLap = null;
+          }
+
+          if (willFinish) {
+            p.skipCellResolveOnce = true;
+          }
+
+          addLog(
+            `🏠 ${p.name} 使用「公司是我家」，強制經過起點 +1圈 + $500${
+              p.longInvestmentBonus > 0
+                ? `（長線投資 +${p.longInvestmentBonus}）`
+                : ''
+            }`
           );
         }
 
-        // 標記：這一回合落在「目標 work5」那格時不再做一次結算
-        p.skipCellResolveOnce = true;
+        // overtime：起點前 work5 → 起點後第一個 work5
+        if (itemToUse.target === 'nextwork5') {
+          const lastWork5Index = 29;  // 起點前最後一格工作日5
+          const firstWork5Index = 6;  // 起點後第一格工作日5
 
-        addLog(
-          `⏰ ${p.name} 使用「連續通宵趕project」，從最後一個工作日5 衝過起點到下一個工作日5，完成最後一圈 +$500${
-            p.longInvestmentBonus > 0
-              ? `（長線投資 +${p.longInvestmentBonus}）`
-              : ''
-          }`
-        );
-      }
+          const willJumpFromLastToFirst5 =
+            fromPos === lastWork5Index && targetPos === firstWork5Index;
+
+          const willFinishByThisJump =
+            willJumpFromLastToFirst5 && p.lap + 1 >= MAX_LAPS;
+
+          // 只要從最後 work5 跨到第一個 work5，就視為跨起點 +1圈
+          if (willJumpFromLastToFirst5) {
+            p.lap += 1;
+            p.wealth = clamp(p.wealth + 500, 0, 10000);
+            if (p.longInvestmentBonus > 0) {
+              p.wealth = clamp(
+                p.wealth + p.longInvestmentBonus,
+                0,
+                10000
+              );
+            }
+
+            // ✅ 跨起點時檢查祈福是否到期
+            if (
+              p.blessingBonus &&
+              p.blessingBonus > 0 &&
+              p.blessingExpireLap === p.lap
+            ) {
+              p.belief = clamp(p.belief - p.blessingBonus, 0, 100);
+              addLog(`${p.name} 的祈福效果已結束，信念恢復正常。`);
+              p.blessingBonus = 0;
+              p.blessingExpireLap = null;
+            }
+
+            if (willFinishByThisJump) {
+              // 標記：這一回合落在「目標 work5」那格時不再做一次結算
+              p.skipCellResolveOnce = true;
+
+              addLog(
+                `⏰ ${p.name} 使用「連續通宵趕project」，從最後一個工作日5 衝過起點到下一個工作日5，完成最後一圈 +$500${
+                  p.longInvestmentBonus > 0
+                    ? `（長線投資 +${p.longInvestmentBonus}）`
+                    : ''
+                }`
+              );
+            } else {
+              // 非最後一圈的普通跨起點 log
+              addLog(
+                `⏰ ${p.name} 使用「連續通宵趕project」，從工作日5 跨過起點到下一個工作日5，+1圈 +$500${
+                  p.longInvestmentBonus > 0
+                    ? `（長線投資 +${p.longInvestmentBonus}）`
+                    : ''
+                }`
+              );
+            }
+          }
+        }
+
+        // 長假享受人生：傳送到假日1，並視為過起點（但不需要 skipCellResolveOnce）
+        if (itemToUse.target === 'holiday1' && fromPos !== 0) {
+          p.lap += 1;
+          p.wealth = clamp(p.wealth + 500, 0, 10000);
+          if (p.longInvestmentBonus > 0) {
+            p.wealth = clamp(
+              p.wealth + p.longInvestmentBonus,
+              0,
+              10000
+            );
+          }
+
+          // ✅ 跨起點時檢查祈福是否到期
+          if (
+            p.blessingBonus &&
+            p.blessingBonus > 0 &&
+            p.blessingExpireLap === p.lap
+          ) {
+            p.belief = clamp(p.belief - p.blessingBonus, 0, 100);
+            addLog(`${p.name} 的祈福效果已結束，信念恢復正常。`);
+            p.blessingBonus = 0;
+            p.blessingExpireLap = null;
+          }
+
+          addLog(
+            `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $500${
+              p.longInvestmentBonus > 0
+                ? `（長線投資 +${p.longInvestmentBonus}）`
+                : ''
+            }`
+          );
+        }
+
+        if (p.lap >= MAX_LAPS) p.isFinished = true;
+
+        next[playerIdx] = p;
+        return next;
+      });
+
+      setShowItemEffect(itemToUse);
+      setShowInventory(null);
+      return;
     }
-
-    // 長假享受人生：傳送到假日1，並視為過起點（但不需要 skipCellResolveOnce）
-    if (itemToUse.target === 'holiday1' && fromPos !== 0) {
-      p.lap += 1;
-      p.wealth = clamp(p.wealth + 500, 0, 10000);
-      if (p.longInvestmentBonus > 0) {
-        p.wealth = clamp(
-          p.wealth + p.longInvestmentBonus,
-          0,
-          10000
-        );
-      }
-      addLog(
-        `🏠 ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $500${
-          p.longInvestmentBonus > 0
-            ? `（長線投資 +${p.longInvestmentBonus}）`
-            : ''
-        }`
-      );
-    }
-
-    if (p.lap >= MAX_LAPS) p.isFinished = true;
-
-    next[playerIdx] = p;
-    return next;
-  });
-
-  setShowItemEffect(itemToUse);
-  setShowInventory(null);
-  return;
-}
 
     // toughitout
     if (itemToUse.id === 'toughitout') {
@@ -785,7 +1112,9 @@ if (itemToUse.target) {
       setPlayers(prev => {
         const next = [...prev];
         const p = { ...next[playerIdx] };
+        // 從手牌移除一張公司股份
         p.items = p.items.filter((_, i) => i !== itemIdx);
+        // 變現 +2000
         p.wealth = clamp(p.wealth + 2000, 0, 10000);
         addLog(
           `🏢 ${p.name} 使用「公司10%股份」，立即獲得 +2000 財力`
@@ -793,12 +1122,16 @@ if (itemToUse.target) {
         next[playerIdx] = p;
         return next;
       });
+
+      // 把市場已售出的股份數量補回 1 張（至少不低於 0）
+      setCompanyShareSold(prev => Math.max(prev - 1, 0));
+
       setShowItemEffect(itemToUse);
       setShowInventory(null);
       return;
     }
 
-    // weed
+    // weed：瘋王次數＋進度提示（只在仍有機會時提示）
     if (itemToUse.id === 'weed') {
       setPlayers(prev => {
         const next = [...prev];
@@ -809,6 +1142,17 @@ if (itemToUse.target) {
         if (p.hasUnlockedMadKing) {
           p.madKingWeedCountAfterUnlock =
             (p.madKingWeedCountAfterUnlock || 0) + 1;
+
+          if (canStillPursueGoal(p, '瘋王')) {
+            notifyGoalProgress(p, {
+              current: p.madKingWeedCountAfterUnlock,
+              target: 10,
+              title: "瘋王",
+              field25: "madKingNotified25",
+              field50: "madKingNotified50",
+              field75: "madKingNotified75",
+            });
+          }
 
           if (
             !p.victoryTitle &&
@@ -834,7 +1178,7 @@ if (itemToUse.target) {
       return;
     }
 
-    // donation
+    // donation：邪教上帝次數＋進度提示（只在仍有機會時提示）
     if (itemToUse.id === 'donation') {
       setPlayers(prev => {
         const next = [...prev];
@@ -845,6 +1189,17 @@ if (itemToUse.target) {
         addLog(
           `⛪ ${p.name} 使用「奉獻」，信念 +10（最高 100），已使用 ${p.donationUseCount} 次。`
         );
+
+        if (canStillPursueGoal(p, '邪教上帝')) {
+          notifyGoalProgress(p, {
+            current: p.donationUseCount,
+            target: 10,
+            title: "邪教上帝",
+            field25: "cultGodNotified25",
+            field50: "cultGodNotified50",
+            field75: "cultGodNotified75",
+          });
+        }
 
         if (
           p.hasUnlockedCultGod &&
@@ -867,55 +1222,91 @@ if (itemToUse.target) {
       return;
     }
 
-    // reportall
-if (itemToUse.id === 'reportall') {
-  setPlayers(prev => {
-    let stolenTotal = 0;
+    // ✅ blessing 祈福三寶
+    if (itemToUse.id === 'blessing') {
+      setPlayers(prev => {
+        const next = [...prev];
+        const p = { ...next[playerIdx] };
 
-    const next = prev.map((p, idx) => {
-      const np = { ...p };
-      if (idx !== playerIdx) {
-        // 基本 -500
-        let delta = 500;
-
-        // 已解鎖瘋王或邪教上帝者再額外 -1500
-        if (np.hasUnlockedMadKing || np.hasUnlockedCultGod) {
-          delta += 1500;
+        // 若已有舊的祈福加成，先扣回避免疊加混亂
+        if (p.blessingBonus && p.blessingBonus > 0) {
+          p.belief = clamp(p.belief - p.blessingBonus, 0, 100);
         }
 
-        // 實際能扣多少（不能低於 0）
-        const actualDeduct = Math.min(delta, np.wealth);
-        np.wealth = clamp(np.wealth - actualDeduct, 0, 10000);
+        p.blessingBonus = 40;
+        p.belief = clamp(p.belief + 40, 0, 100);
+        p.blessingExpireLap = p.lap + 1; // 一圈後失效
 
-        // 累計被扣金額，稍後加到施放者身上
-        stolenTotal += actualDeduct;
-      }
-      return np;
-    });
+        // 消耗道具
+        p.items = p.items.filter((_, i) => i !== itemIdx);
 
-    const self = { ...next[playerIdx] };
-    // 移除自己手上的「報串」
-    self.items = self.items.filter((_, i) => i !== itemIdx);
-    // 把偷到的總額加到自己財力
-    if (stolenTotal > 0) {
-      self.wealth = clamp(self.wealth + stolenTotal, 0, 10000);
+        addLog(
+          `🕯️ ${p.name} 使用「祈福三寶」，信念暫時提升 40，隨機事件的負面效果打擊將減輕一圈。`
+        );
+
+        next[playerIdx] = p;
+        return next;
+      });
+
+      setShowItemEffect(itemToUse);
+      setShowInventory(null);
+      return;
     }
 
-    next[playerIdx] = self;
-    return next;
-  });
+    // reportall
+    if (itemToUse.id === 'reportall') {
+      setPlayers(prev => {
+        let stolenTotal = 0;
 
-  addLog(
-    `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，特定玩家則再額外 -1500，全部轉移到自己身上！`
-  );
-  setShowItemEffect(itemToUse);
-  setShowInventory(null);
-  setTimeout(
-    () => setPendingRecovery({ playerIndex: turnIndex, source: 'item', ts: Date.now() }),
-    400
-  );
-  return;
-}
+        const next = prev.map((p, idx) => {
+          const np = { ...p };
+          if (idx !== playerIdx) {
+            // 基本 -500
+            let delta = 500;
+
+            // 已解鎖瘋王或邪教上帝者再額外 -1500
+            if (np.hasUnlockedMadKing || np.hasUnlockedCultGod) {
+              delta += 1500;
+            }
+
+            // 實際能扣多少（不能低於 0）
+            const actualDeduct = Math.min(delta, np.wealth);
+            np.wealth = clamp(np.wealth - actualDeduct, 0, 10000);
+
+            // 累計被扣金額，稍後加到施放者身上
+            stolenTotal += actualDeduct;
+          }
+          return np;
+        });
+
+        const self = { ...next[playerIdx] };
+        // 移除自己手上的「報串」
+        self.items = self.items.filter((_, i) => i !== itemIdx);
+        // 把偷到的總額加到自己財力
+        if (stolenTotal > 0) {
+          self.wealth = clamp(self.wealth + stolenTotal, 0, 10000);
+        }
+
+        next[playerIdx] = self;
+        return next;
+      });
+
+      addLog(
+        `📢 ${player.name} 使用「報串」：其他所有玩家財力 -500，特定玩家則再額外 -1500，全部轉移到自己身上！`
+      );
+      setShowItemEffect(itemToUse);
+      setShowInventory(null);
+      setTimeout(
+        () =>
+          setPendingRecovery({
+            playerIndex: turnIndex,
+            source: 'item',
+            ts: Date.now(),
+          }),
+        400
+      );
+      return;
+    }
   },
   [
     players,
@@ -931,6 +1322,8 @@ if (itemToUse.id === 'reportall') {
     setShowInventory,
     setPendingRecovery,
     setGameState,
+    notifyGoalProgress,
+    canStillPursueGoal,
   ]
 );
 
@@ -950,13 +1343,69 @@ const handleApplyTargetEffect = useCallback(
       if (itemToUse.id === 'workunload') {
         selfP.stress = clamp(selfP.stress - 50, 0, 100);
         targetP.stamina = clamp(targetP.stamina - 30, 0, 100);
-        addLog(`💼 ${selfP.name} 使用「職場卸膊」：自身壓力 -50，${targetP.name} 體力 -30`);
+        addLog(
+          `💼 ${selfP.name} 使用「職場卸膊」：自身壓力 -50，${targetP.name} 體力 -30`
+        );
       } else if (itemToUse.id === 'borrownotreturn') {
         selfP.wealth = clamp(selfP.wealth + 1500, 0, 10000);
         targetP.wealth = clamp(targetP.wealth - 1500, 0, 10000);
-        addLog(`💸 ${selfP.name} 使用「借錢不還」：自己 +1500，${targetP.name} -1500`);
+        addLog(
+          `💸 ${selfP.name} 使用「借錢不還」：自己 +1500，${targetP.name} -1500`
+        );
+      } else if (itemToUse.id === 'phonefraud') {
+        // 先從自己手上移除「電話詐騙」
+        selfP.items = selfP.items.filter((_, i) => i !== itemIdx);
+
+        // 檢查目標是否有公司10%股份
+        const shareIndex = targetP.items.findIndex(
+          it => it.id === 'companyshare'
+        );
+
+        if (shareIndex !== -1) {
+          // 對方有公司10%股份 → 奪走 1 張
+          const takenShare = targetP.items[shareIndex];
+
+          // 從對方移除一張 companyshare
+          targetP.items = targetP.items.filter((_, i) => i !== shareIndex);
+          // 把股份給詐騙者（如果你不想給詐騙者，刪掉下一行即可）
+          selfP.items = [...selfP.items, takenShare];
+
+          addLog(
+            `📞 ${selfP.name} 使用「電話詐騙」，從 ${targetP.name} 手上騙走 1 張「公司10%股份」！`
+          );
+        } else {
+          // 對方沒有股份 → 騙走最多 2000 財力
+          const stealAmount = Math.min(2000, targetP.wealth);
+
+          if (stealAmount > 0) {
+            targetP.wealth = clamp(
+              targetP.wealth - stealAmount,
+              0,
+              10000
+            );
+            selfP.wealth = clamp(
+              selfP.wealth + stealAmount,
+              0,
+              10000
+            );
+
+            addLog(
+              `📞 ${selfP.name} 使用「電話詐騙」，從 ${targetP.name} 手上騙走 ${stealAmount} 財力！`
+            );
+          } else {
+            addLog(
+              `📞 ${selfP.name} 使用「電話詐騙」，但 ${targetP.name} 身無分文，無法得手。`
+            );
+          }
+        }
+
+        // 已在上面先移除道具，這裡就不要再動 selfP.items 了
+        next[turnIndex] = selfP;
+        next[targetIdx] = targetP;
+        return next;
       }
 
+      // 一般需要指定目標的道具（職場卸膊、借錢不還等）
       selfP.items = selfP.items.filter((_, i) => i !== itemIdx);
 
       next[turnIndex] = selfP;
@@ -965,269 +1414,383 @@ const handleApplyTargetEffect = useCallback(
     });
 
     setTimeout(() => {
-      setPendingRecovery({ playerIndex: turnIndex, source: 'item', ts: Date.now() });
+      setPendingRecovery({
+        playerIndex: turnIndex,
+        source: 'item',
+        ts: Date.now(),
+      });
     }, 400);
   },
   [turnIndex, setPlayers, setShowTargetSelector, setPendingRecovery, addLog]
 );
 
-const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
-  const currentIdx = turnIndex;
-  addLog(`🚨 ${players[currentIdx].name} ${reason}，強制遣返獲得救濟 $500。`);
-
-  let madKingJustUnlocked = null;  // ★ 新增：用來記錄剛解鎖的玩家名
-
-  setPlayers(prev => {
-    const next = [...prev];
-    const p = { ...next[currentIdx] };
-
-    p.pos = 0;
-    p.lap += 1;
-    p.wealth = clamp(p.wealth + 500, 0, 10000);
-    p.hasLandedOnHoliday = true;
-
-    p.socialSubsidyCount = (p.socialSubsidyCount || 0) + 1;
-
-    if (!p.hasUnlockedMadKing && p.socialSubsidyCount >= 3 && p.hasUsedWeed) {
-      p.hasUnlockedMadKing = true;
-      p.hiddenGoals = [...(p.hiddenGoals || []), '瘋王'];
-      addLog(
-        `🧠 ${p.name} 觸發隱藏目標【瘋王】：已多次依賴社會補貼，若之後在解鎖後累積服用大麻 10 次，即可成就瘋王！`
-      );
-      madKingJustUnlocked = p.name;  // ★ 標記
-    }
-
-    if (p.lap >= MAX_LAPS) p.isFinished = true;
-    next[currentIdx] = p;
-    return next;
-  });
-
-  // ★ 在 setPlayers 之後，如果本次有解鎖瘋王，就顯示彈窗
-  if (madKingJustUnlocked) {
-    setHiddenGoalPopup({
-      playerName: madKingJustUnlocked,
-      goalTitle: '瘋王',
-      message:
-        '已觸發隱藏目標【瘋王】：之後若服用大麻達 10 次，將達成瘋王結局。',
-    });
+const passTurn = useCallback((cur) => {
+  if (cur.some(p => p.victoryTitle) || cur.every(p => p.isFinished)) {
+    setGameState('gameover');
+    return;
   }
 
-  setIsMoving(false);
-  setPendingRecovery({
-    playerIndex: currentIdx,
-    source: 'subsidy',
-    ts: Date.now(),
-  });
-}, [turnIndex, players, setPlayers, addLog, setIsMoving, setPendingRecovery, setHiddenGoalPopup]);
+  let nextIdx = turnIndex;
+  let count = 0;
+  do {
+    nextIdx = (nextIdx + 1) % cur.length;
+    count++;
+  } while (cur[nextIdx].isFinished && count < cur.length);
 
-  const handleMove = useCallback(async (steps) => {
-  const s = parseInt(steps, 10);
-  if (isMoving || isProcessing || isNaN(s) || s < 1) return;
+  setTurnIndex(nextIdx);
+}, [turnIndex, setGameState, setTurnIndex]);
 
-  const player = players[turnIndex];
-  if (player.isFinished) return;
+const triggerSocialSubsidy = useCallback(
+  (reason = '財力不足') => {
+    const currentIdx = turnIndex;
+    const currentPlayer = players[currentIdx];
 
-  const check = checkMoveFeasibility(player, s);
+    if (!currentPlayer) return;
 
-  // ===== 體力不足情況（真人 / AI 共用） =====
-  if (!check.possible) {
-    const oneStepCheck = checkMoveFeasibility(player, 1);
+    addLog(
+      `🚨 ${currentPlayer.name} ${reason}，強制加入政府疪護工場工作並獲得救濟 $500。`
+    );
 
-    // 連 1 格都走不到 → 十倍財力強推 1 格 → 不行才社會補貼
-    if (!oneStepCheck.possible) {
-      const nextPos = (player.pos + 1) % TOTAL_CELLS;
-      const nextCell = BOARD_CELLS[nextPos];
-      const costForNext = nextCell.cost || 0;
+    // ✅ 在 useCallback 外層宣告旗標，只在這次 handler 內有效
+    let madKingJustUnlocked = null;
 
-      if (player.stamina < costForNext) {
-        const tenTimesWealthCost = costForNext * 10;
-
-        if (player.wealth >= tenTimesWealthCost) {
-          addLog(`💸 ${player.name} 體力不足（連 1 格都走不動），支付 ${tenTimesWealthCost} 財力強行移動 1 格。`);
-
-          setIsMoving(true);
-
-          setPlayers(prev => {
-            const next = [...prev];
-            let p = { ...next[turnIndex] };
-
-            p.wealth = clamp(p.wealth - tenTimesWealthCost, 0, 10000);
-
-            const cell = BOARD_CELLS[(p.pos + 1) % TOTAL_CELLS];
-            const moveCost = cell.cost || 0;
-
-            p.stamina = clamp(p.stamina - moveCost, 0, 100);
-            p.stress  = clamp(p.stress + moveCost, 0, 100);
-            p.spirit  = clamp(p.spirit - moveCost, 0, 100);
-
-            const wc = cell.wealthCost || 0;
-            if (wc > 0) p.wealth = clamp(p.wealth - wc, 0, 10000);
-
-            p.pos = (p.pos + 1) % TOTAL_CELLS;
-
-            // 經過起點時，同樣處理圈數與完結
-            if (p.pos === 0) {
-              p.lap += 1;
-              p.wealth = clamp(p.wealth + 500, 0, 10000);
-              if (p.longInvestmentBonus > 0) {
-                p.wealth = clamp(p.wealth + p.longInvestmentBonus, 0, 10000);
-              }
-              if (p.lap >= MAX_LAPS) p.isFinished = true;
-            }
-
-            // 強制移動這回合的 planned stop 就是這一格
-            p.lastPlannedStopCellIndex = p.pos;
-
-            next[turnIndex] = p;
-            return next;
-          });
-
-          setTimeout(() => {
-            setPendingRecovery({ playerIndex: turnIndex, source: 'move', ts: Date.now() });
-            setIsMoving(false);
-          }, 600);
-
-          return;
-        } else {
-          // 體力也不夠、財力也不夠 → 社會補貼
-          triggerSocialSubsidy('體力與財力嚴重不足');
-          return;
-        }
-      }
-
-      addLog(`⛔ [系統攔截] ${player.name} 體力不足，連 1 格都走不動。`);
-      setIsMoving(false);
-      return;
-    }
-
-    // 走不到 s 格，但走得了一格
-    if (!player.isAI) {
-      // 真人：提示改步數
-      addLog(`⛔ [系統攔截] ${player.name} 體力不足，無法走 ${s} 格，請重新選擇較少的步數。`);
-      setIsMoving(false);
-      return;
-    } else {
-      // AI：自動縮成最多可行步數
-      const maxSteps = getMaxFeasibleSteps(player, s);
-      const safeSteps = Math.max(maxSteps, 1);  // 理論上 maxSteps >= 1，保險起見
-
-      addLog(`🤖 ${player.name} 體力不足無法走 ${s} 格，自動改為走 ${safeSteps} 格。`);
-      setIsMoving(false);
-      await handleMove(safeSteps);
-      return;
-    }
-  }
-
-  // ===== 正常移動 =====
-  setIsProcessing(true);
-  setIsMoving(true);
-  const currentTurnIndex = turnIndex;
-  let tempPlayer = { ...players[currentTurnIndex] };
-  let weeklyExpense = 0;
-
-  // 🔹 原本預期的停留格（不考慮截停）
-  const plannedStopPos = (tempPlayer.pos + s) % TOTAL_CELLS;
-
-  for (let i = 0; i < s; i++) {
-    await new Promise(r => setTimeout(r, 120));
-
-    // 已完成所有圈數 → 截停，不再走後續格子
-    if (tempPlayer.isFinished) {
-      break;
-    }
-
-    const prevPos = tempPlayer.pos;
-    const nextPos = (prevPos + 1) % TOTAL_CELLS;
-    const cell = BOARD_CELLS[nextPos];
-    const cost = cell.cost || 0;
-
-    tempPlayer.stamina = clamp(tempPlayer.stamina - cost, 0, 100);
-    tempPlayer.stress  = clamp(tempPlayer.stress + cost, 0, 100);
-    tempPlayer.spirit  = clamp(tempPlayer.spirit - cost, 0, 100);
-    tempPlayer.pos = nextPos;
-
-    // 跨越起點 → +1圈 +500 (+長線投資)，並在總圈數時標記 isFinished
-    if (prevPos !== 0 && nextPos === 0) {
-      tempPlayer.lap += 1;
-      tempPlayer.wealth = clamp(tempPlayer.wealth + 500, 0, 10000);
-      if (tempPlayer.longInvestmentBonus > 0) {
-        tempPlayer.wealth = clamp(tempPlayer.wealth + tempPlayer.longInvestmentBonus, 0, 10000);
-      }
-      addLog(
-        `💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $500${
-          tempPlayer.longInvestmentBonus > 0 ? `（長線投資 +${tempPlayer.longInvestmentBonus}）` : ''
-        }`
-      );
-      if (tempPlayer.lap >= MAX_LAPS) {
-        tempPlayer.isFinished = true;
-        // 下一輪 for 開頭會因 isFinished === true 截停
-      }
-    }
-
-    // 工作日5 累積每週開支
-    if (typeof cell.name === "string" && cell.name.includes("工作日5")) {
-      weeklyExpense += 50;
-    }
-
-    // 同步整個 tempPlayer 回 state（包含 wealth / lap 等）
     setPlayers(prev => {
       const next = [...prev];
-      next[currentTurnIndex] = { ...next[currentTurnIndex], ...tempPlayer };
+      const p = { ...next[currentIdx] };
+
+      // 回起點（假日1），並視為走完一圈
+      p.pos = 0;
+      p.lap += 1;
+      p.wealth = clamp(p.wealth + 500, 0, 10000);
+      p.hasLandedOnHoliday = true;
+      p.socialSubsidyCount = (p.socialSubsidyCount || 0) + 1;
+
+      // 瘋王解鎖判定
+      if (
+        !p.hasUnlockedMadKing &&
+        p.socialSubsidyCount >= 3 &&
+        p.hasUsedWeed
+      ) {
+        p.hasUnlockedMadKing = true;
+        p.hiddenGoals = [...(p.hiddenGoals || []), '瘋王'];
+
+        addLog(
+          `🧠 ${p.name} 觸發隱藏目標【瘋王】：已多次依賴社會補貼，若之後在解鎖後累積服用大麻 10 次，即可成就瘋王！`
+        );
+
+        // ✅ 設置本次 handler 內的旗標
+        madKingJustUnlocked = p.name;
+      }
+
+      if (p.lap >= MAX_LAPS) p.isFinished = true;
+
+      next[currentIdx] = p;
       return next;
     });
-  }
 
-  // 🔹 將「本回合原本預期停留格」記錄到玩家狀態
-  setPlayers(prev => {
-    const next = [...prev];
-    const p = { ...next[currentTurnIndex] };
-    p.lastPlannedStopCellIndex = plannedStopPos;
-    next[currentTurnIndex] = p;
-    return next;
-  });
+    // ❗ React 的 state 更新是排隊執行，但這裡使用的是
+    // 「同一個 call stack 裡的閉包變數」，只要 setPlayers callback 被跑過，
+    // madKingJustUnlocked 就會被更新，所以這裡可以安全讀到
+    if (madKingJustUnlocked) {
+      setHiddenGoalPopup({
+        playerName: madKingJustUnlocked,
+        goalTitle: '瘋王',
+        message:
+          '已觸發隱藏目標【瘋王】：之後若服用大麻達 10 次，將達成瘋王結局。',
+      });
+    }
 
-  setTimeout(() => {
-    let didTriggerSubsidy = false;
+    // 交由通用「恢復 → 事件 → passTurn」流程處理補貼後的落格與事件
+    setIsMoving(false);
+    setIsProcessing(false);
+    setPendingRecovery({
+      playerIndex: currentIdx,
+      source: 'subsidy',
+      ts: Date.now(),
+    });
+  },
+  [
+    turnIndex,
+    players,
+    setPlayers,
+    addLog,
+    setIsMoving,
+    setIsProcessing,
+    setPendingRecovery,
+    setHiddenGoalPopup,
+  ]
+);
 
-    setPlayers(prev => {
-      const next = [...prev];
-      let p = { ...next[currentTurnIndex] };
+  const handleMove = useCallback(
+  async (steps) => {
+    const s = parseInt(steps, 10);
+    if (isMoving || isProcessing || isNaN(s) || s < 1) return;
 
-      if (weeklyExpense > 0) {
-        if (p.wealth >= weeklyExpense) {
-          p.wealth = clamp(p.wealth - weeklyExpense, 0, 10000);
-          addLog(`💰 ${p.name} 繳納每週開支 ${weeklyExpense}。`);
+    const player = players[turnIndex];
+    if (player.isFinished) return;
+
+    const check = checkMoveFeasibility(player, s);
+
+    // ===== 體力不足情況（真人 / AI 共用） =====
+    if (!check.possible) {
+      const oneStepCheck = checkMoveFeasibility(player, 1);
+
+      // 連 1 格都走不到 → 在這裡考慮「放病假」資格與最大可走格數（精準模擬）
+      if (!oneStepCheck.possible) {
+        const nextPos = (player.pos + 1) % TOTAL_CELLS;
+        const nextCell = BOARD_CELLS[nextPos];
+        const costForNext = nextCell.cost || 0;
+
+        // 下一格沒有 cost → 當成真的連一格都動不了
+        if (costForNext <= 0) {
+          addLog(
+            `⛔ [系統攔截] ${player.name} 體力不足，連 1 格都走不動。`
+          );
+          triggerSocialSubsidy("體力與財力嚴重不足");
+          return;
+        }
+
+        const sickLeaveCostForNext = costForNext * 40;
+
+        // 體力不足、財力也不足以放病假跨過第一格 → 社會補貼
+        if (player.wealth < sickLeaveCostForNext) {
+          addLog(
+            `⛔ [系統攔截] ${player.name} 體力不足且財力不足以支付放病假成本，連 1 格都走不了。`
+          );
+          triggerSocialSubsidy("體力與財力嚴重不足");
+          return;
+        }
+
+        // 體力連 1 格都不夠，但財力可以放病假，使用「體力 + 放病假」精準模擬最大步數
+        const maxVirtualSteps = getMaxStepsWithSickLeave(player, s);
+
+        if (!player.isAI && s > maxVirtualSteps) {
+          // 真人：輸入步數大於實際可走步數 → 提示重選，不開始移動
+          addLog(
+            `⛔ [系統攔截] ${player.name} 體力不足只能依靠「放病假」，以目前體力與財力最多只能走 ${maxVirtualSteps} 格，無法走 ${s} 格，請重新選擇較少的步數。`
+          );
+          setIsMoving(false);
+          return;
+        }
+
+        // AI：自動縮成可走步數
+        if (player.isAI && s > maxVirtualSteps) {
+          const safeSteps = Math.max(maxVirtualSteps, 1);
+          addLog(
+            `🤖 ${player.name} 體力不足只能依靠放病假，以目前體力與財力最多只能走 ${safeSteps} 格，無法走 ${s} 格，自動改為走 ${safeSteps} 格。`
+          );
+          setIsMoving(false);
+          await handleMove(safeSteps);
+          return;
+        }
+
+        // 否則（s <= maxVirtualSteps），放行到下方 for 迴圈，由放病假真實結算
+      } else {
+        // 走不到 s 格，但走得了一格（純體力情況）
+        if (!player.isAI) {
+          // 真人：提示改步數（不允許用放病假補足超出的格數）
+          addLog(
+            `⛔ [系統攔截] ${player.name} 體力不足，無法走 ${s} 格，請重新選擇較少的步數。`
+          );
+          setIsMoving(false);
+          return;
         } else {
-          didTriggerSubsidy = true;
+          // AI：自動縮成最多可行步數（只看體力）
+          const maxSteps = getMaxFeasibleSteps(player, s);
+          const safeSteps = Math.max(maxSteps, 1);
+
+          addLog(
+            `🤖 ${player.name} 體力不足無法走 ${s} 格，自動改為走 ${safeSteps} 格。`
+          );
+          setIsMoving(false);
+          await handleMove(safeSteps);
+          return;
+        }
+      }
+    }
+
+    // ===== 正常移動（可走 s 格，過程中加入放病假機制） =====
+    setIsProcessing(true);
+    setIsMoving(true);
+    const currentTurnIndex = turnIndex;
+    let tempPlayer = { ...players[currentTurnIndex] };
+    let weeklyExpense = 0;
+
+    // 原本預期的停留格（不考慮截停）
+    const plannedStopPos = (tempPlayer.pos + s) % TOTAL_CELLS;
+
+    // 放病假統計
+    let sickLeaveDays = 0;
+    let sickLeaveCostTotal = 0;
+
+    for (let i = 0; i < s; i++) {
+      await new Promise((r) => setTimeout(r, 120));
+
+      // 已完成所有圈數 → 截停
+      if (tempPlayer.isFinished) {
+        break;
+      }
+
+      const prevPos = tempPlayer.pos;
+      const nextPos = (prevPos + 1) % TOTAL_CELLS;
+      const cell = BOARD_CELLS[nextPos];
+      const cost = cell.cost || 0;
+
+      if (cost > 0 && tempPlayer.stamina < cost) {
+        // 體力不足這一格 → 嘗試放病假
+        const sickLeaveCost = cost * 40;
+
+        if (tempPlayer.wealth >= sickLeaveCost) {
+          tempPlayer.wealth = clamp(
+            tempPlayer.wealth - sickLeaveCost,
+            0,
+            10000
+          );
+          sickLeaveDays += 1;
+          sickLeaveCostTotal += sickLeaveCost;
+          // 不扣 stamina / stress / spirit
+        } else {
+          addLog(
+            `⛔ ${tempPlayer.name} 體力與財力都不足以再前進，只能停在這裡。`
+          );
+          break;
+        }
+      } else {
+        // 體力足夠 → 正常扣體力
+        tempPlayer.stamina = clamp(tempPlayer.stamina - cost, 0, 100);
+        tempPlayer.stress = clamp(tempPlayer.stress + cost, 0, 100);
+        tempPlayer.spirit = clamp(tempPlayer.spirit - cost, 0, 100);
+      }
+
+      tempPlayer.pos = nextPos;
+
+      // 跨越起點 → +1圈 +500 (+長線投資)
+      if (prevPos !== 0 && nextPos === 0) {
+        tempPlayer.lap += 1;
+        tempPlayer.wealth = clamp(tempPlayer.wealth + 500, 0, 10000);
+        if (tempPlayer.longInvestmentBonus > 0) {
+          tempPlayer.wealth = clamp(
+            tempPlayer.wealth + tempPlayer.longInvestmentBonus,
+            0,
+            10000
+          );
+        }
+
+        // ✅ 檢查祈福三寶是否到期
+        if (
+          tempPlayer.blessingBonus &&
+          tempPlayer.blessingBonus > 0 &&
+          tempPlayer.blessingExpireLap === tempPlayer.lap
+        ) {
+          tempPlayer.belief = clamp(
+            tempPlayer.belief - tempPlayer.blessingBonus,
+            0,
+            100
+          );
+          addLog(
+            `${tempPlayer.name} 的祈福效果已結束，信念恢復正常。`
+          );
+          tempPlayer.blessingBonus = 0;
+          tempPlayer.blessingExpireLap = null;
+        }
+
+        addLog(
+          `💵 ${tempPlayer.name} 完成一圈，領取一個月薪金 $500${
+            tempPlayer.longInvestmentBonus > 0
+              ? `（長線投資 +${tempPlayer.longInvestmentBonus}）`
+              : ""
+          }`
+        );
+        if (tempPlayer.lap >= MAX_LAPS) {
+          tempPlayer.isFinished = true;
         }
       }
 
+      // 工作日5 累積每週開支
+      if (cell.type === "work" && cell.name === "工作日5") {
+        weeklyExpense += 50;
+      }
+
+      // 同步整個 tempPlayer 回 state
+      setPlayers((prev) => {
+        const next = [...prev];
+        next[currentTurnIndex] = {
+          ...next[currentTurnIndex],
+          ...tempPlayer,
+        };
+        return next;
+      });
+    }
+
+    // 如果有放病假，補一條 log
+    if (sickLeaveDays > 0 && sickLeaveCostTotal > 0) {
+      addLog(
+        `🛌 ${tempPlayer.name} 以 ${sickLeaveCostTotal} 財力買了 ${sickLeaveDays} 日病假紙，輕鬆走完這一段。`
+      );
+    }
+
+    // 記錄本回合原本預期停留格
+    setPlayers((prev) => {
+      const next = [...prev];
+      const p = { ...next[currentTurnIndex] };
+      p.lastPlannedStopCellIndex = plannedStopPos;
       next[currentTurnIndex] = p;
       return next;
     });
 
-    if (didTriggerSubsidy) {
-      triggerSocialSubsidy("財力不足繳納開支");
-      setIsMoving(false);
-      setIsProcessing(false);
-    } else {
-      setPendingRecovery({ playerIndex: currentTurnIndex, source: 'move', ts: Date.now() });
-      setIsMoving(false);
-      setIsProcessing(false);
-    }
-  }, 300);
-}, [
-  players,
-  turnIndex,
-  setPlayers,
-  isMoving,
-  isProcessing,
-  setIsMoving,
-  setIsProcessing,
-  addLog,
-  triggerSocialSubsidy,
-  setPendingRecovery,
-]);
+    // ===== 週開支與補貼判定 =====
+    setTimeout(() => {
+      let triggeredHere = false;
+
+      setPlayers((prev) => {
+        const next = [...prev];
+        let p = { ...next[currentTurnIndex] };
+
+        if (weeklyExpense > 0) {
+          if (p.wealth >= weeklyExpense) {
+            p.wealth = clamp(p.wealth - weeklyExpense, 0, 10000);
+            addLog(`💰 ${p.name} 繳納每週開支 ${weeklyExpense}。`);
+          } else {
+            // 財力不足以支付週開支 → 直接在這裡觸發社會補貼
+            triggeredHere = true;
+            next[currentTurnIndex] = p;
+            triggerSocialSubsidy("財力不足繳納開支");
+            return next;
+          }
+        }
+
+        next[currentTurnIndex] = p;
+        return next;
+      });
+
+      // 若本回合未在這裡觸發社會補貼，正常進入恢復/事件流程
+      if (!triggeredHere) {
+        setPendingRecovery({
+          playerIndex: currentTurnIndex,
+          source: "move",
+          ts: Date.now(),
+        });
+        setIsMoving(false);
+        setIsProcessing(false);
+      }
+    }, 300);
+  },
+  [
+    players,
+    turnIndex,
+    setPlayers,
+    isMoving,
+    isProcessing,
+    setIsMoving,
+    setIsProcessing,
+    addLog,
+    triggerSocialSubsidy,
+    setPendingRecovery,
+    checkMoveFeasibility,
+    getMaxFeasibleSteps,
+    getMaxStepsWithSickLeave,
+  ]
+);
 
   const handleRecoveryAndEvent = useCallback(
   (playerIndex) => {
@@ -1236,8 +1799,7 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
       let finalP = { ...next[playerIndex] };
       const cell = BOARD_CELLS[finalP.pos];
 
-      // ★ 新增：若這回合被標記要略過一次落格結算，
-      //         就完全不做工作日計數、假日計數、抽卡等
+      // 略過一次落格結算
       if (finalP.skipCellResolveOnce) {
         finalP.skipCellResolveOnce = false;
         next[playerIndex] = finalP;
@@ -1246,18 +1808,48 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
 
       // 先更新各種計數
       if (cell.type === "work") {
-        if (cell.name === 1) finalP.work1Count = (finalP.work1Count || 0) + 1;
-        else if (cell.name === 2) finalP.work2Count = (finalP.work2Count || 0) + 1;
-        else if (cell.name === 3) finalP.work3Count = (finalP.work3Count || 0) + 1;
-        else if (cell.name === 4) finalP.work4Count = (finalP.work4Count || 0) + 1;
-        else if (cell.name === 5) finalP.work5Count = (finalP.work5Count || 0) + 1;
+        if (cell.name === 1) {
+          finalP.work1Count = (finalP.work1Count || 0) + 1;
+
+          // ★ 卷王進度提示：僅在仍有機會追「卷王」時才提示
+          if (canStillPursueGoal(finalP, '卷王')) {
+            notifyGoalProgress(finalP, {
+              current: finalP.work1Count,
+              target: 32,
+              title: "卷王",
+              field25: "kingOfCompetitionNotified25",
+              field50: "kingOfCompetitionNotified50",
+              field75: "kingOfCompetitionNotified75",
+            });
+          }
+        } else if (cell.name === 2) {
+          finalP.work2Count = (finalP.work2Count || 0) + 1;
+        } else if (cell.name === 3) {
+          finalP.work3Count = (finalP.work3Count || 0) + 1;
+        } else if (cell.name === 4) {
+          finalP.work4Count = (finalP.work4Count || 0) + 1;
+        } else if (cell.name === 5) {
+          finalP.work5Count = (finalP.work5Count || 0) + 1;
+
+          // ★ 蛇王進度提示：僅在仍有機會追「蛇王」時才提示
+          if (canStillPursueGoal(finalP, '蛇王')) {
+            notifyGoalProgress(finalP, {
+              current: finalP.work5Count,
+              target: 32,
+              title: "蛇王",
+              field25: "slackOffKingNotified25",
+              field50: "slackOffKingNotified50",
+              field75: "slackOffKingNotified75",
+            });
+          }
+        }
       }
 
       const isWork = cell.type === "work";
       const isHoliday = !!cell.holiday;
       const cellCost = cell.cost || 0;
 
-      // === 五個「要走完圈數」的稱號，一律在這裡判 ===
+      // === 極端稱號判定 ===
       if (finalP.isFinished && !finalP.victoryTitle) {
         const w1 = finalP.work1Count || 0;
         const w2 = finalP.work2Count || 0;
@@ -1265,24 +1857,19 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
         const w4 = finalP.work4Count || 0;
         const w5 = finalP.work5Count || 0;
 
-        // 🔹 計算「這回合原本計劃停留」的格子
         const plannedIndex = finalP.lastPlannedStopCellIndex;
         const plannedCell = plannedIndex != null ? BOARD_CELLS[plannedIndex] : null;
         const isPlannedWorkCell = plannedCell && plannedCell.type === "work";
 
-        const isAtStartHoliday = !!cell.holiday && cell.id === 0; // 視盤面設定，id 0 為起點
+        const isAtStartHoliday = !!cell.holiday && cell.id === 0;
         const isLastLap = finalP.lap >= MAX_LAPS;
 
-        // 🔹 是否可以忽略「最後一圈被截停在起點假日」這次踩假日
         const canIgnoreStartHoliday =
           isLastLap &&
           isAtStartHoliday &&
           isPlannedWorkCell;
 
-        // 將 hasLandedOnHoliday + 本格資訊合併成「有效假日」判斷
         let hasEverSteppedHoliday = finalP.hasLandedOnHoliday;
-
-        // 若本回合是起點假日且可忽略，則視為沒踩過有效假日
         if (canIgnoreStartHoliday) {
           hasEverSteppedHoliday = false;
         }
@@ -1294,7 +1881,7 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
           finalP.victoryTitle = "King of Leisure";
         }
 
-        // 2. 卷王：僅踩 work1，且 work1 >= 32
+        // 2. 卷王
         const onlyWork1 =
           w2 === 0 && w3 === 0 && w4 === 0 && w5 === 0 && w1 > 0;
         if (
@@ -1305,7 +1892,7 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
           finalP.victoryTitle = "卷王";
         }
 
-        // 3. 蛇王：僅踩 work5，且 work5 >= 32
+        // 3. 蛇王
         const onlyWork5 =
           w1 === 0 && w2 === 0 && w3 === 0 && w4 === 0 && w5 > 0;
         if (
@@ -1316,7 +1903,7 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
           finalP.victoryTitle = "蛇王";
         }
 
-        // 4. 地獄黑仔王：負面事件 >= 20，且 work1 沒正面翻盤，並且有在 work1 上過
+        // 4. 地獄黑仔王
         const negativeEvents = finalP.negativeEventsCount || 0;
         const hasPositiveOnWork1 = !!finalP.hasPositiveOnWork1;
         if (
@@ -1357,30 +1944,14 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
       return next;
     });
   },
-  [setPlayers, drawCard, setActiveEvent, setGameState, addLog]
+  [setPlayers, drawCard, setActiveEvent, setGameState, addLog, notifyGoalProgress, canStillPursueGoal]
 );
 
-  const passTurn = useCallback((cur) => {
-  if (cur.some(p => p.victoryTitle) || cur.every(p => p.isFinished)) {
-    setGameState('gameover');
-    return;
-  }
-
-  let nextIdx = turnIndex;
-  let count = 0;
-  do {
-    nextIdx = (nextIdx + 1) % cur.length;
-    count++;
-  } while (cur[nextIdx].isFinished && count < cur.length);
-
-  setTurnIndex(nextIdx);
-}, [turnIndex, setGameState, setTurnIndex]);
-
-  const applyEventEffect = () => {
+  const applyEventEffect = useCallback(() => {
   if (!activeEvent) return;
 
   const { playerIndex, event } = activeEvent;
-  let cultGodJustUnlocked = null;
+  let cultGodJustUnlocked = null; // 邪教上帝剛解鎖的玩家名稱（若有）
 
   setPlayers(prev => {
     const next = [...prev];
@@ -1408,16 +1979,41 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
       isNegativeEvent = HOLIDAY_NEGATIVE_EVENTS.some(n => n.id === event.id);
     }
 
-    // 統計負面事件，及工作日1的正面事件（地獄黑仔王用）
+    // 統計負面事件，及工作日1的正面／負面事件（地獄黑仔王用）
     if (isNegativeEvent) {
       p.negativeEventsCount = (p.negativeEventsCount || 0) + 1;
-    } else {
-      if (isWork && cell.name === "工作日1") {
-        p.hasPositiveOnWork1 = true;
+
+      // ★ 地獄黑仔王：總負面事件進度（只在仍有機會時提示）
+      if (canStillPursueGoal(p, '地獄黑仔王')) {
+        notifyGoalProgress(p, {
+          current: p.negativeEventsCount,
+          target: 20,
+          title: "地獄黑仔王",
+          field25: "badLuckKingNotified25",
+          field50: "badLuckKingNotified50",
+          field75: "badLuckKingNotified75",
+        });
       }
+
+      // ★ 地獄黑仔王：工作日1 上的負面事件次數進度（只在仍有機會時提示）
+      if (isWork && cell.name === "工作日1" && canStillPursueGoal(p, '地獄黑仔王')) {
+        p.badLuckOnWork1Count = (p.badLuckOnWork1Count || 0) + 1;
+
+        notifyGoalProgress(p, {
+          current: p.badLuckOnWork1Count,
+          target: 10,
+          title: "地獄黑仔王（工作日1）",
+          field25: "badLuckKingNotified25_Work1",
+          field50: "badLuckKingNotified50_Work1",
+          field75: "badLuckKingNotified75_Work1",
+        });
+      }
+    } else if (isWork && cell.name === "工作日1") {
+      // 在工作日1 翻到正面事件，代表地獄黑仔王路線破局
+      p.hasPositiveOnWork1 = true;
     }
 
-    // 再做原本的 belief 放大邏輯 ----------------
+    // belief 放大邏輯 ----------------
     const beliefBefore = p.belief || 0;
     const beliefNow = beliefBefore;
     const lowBelief = beliefNow < 30;
@@ -1450,10 +2046,15 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
     // 邪教上帝判定 -----------------------------
     const evId = event.event?.id || event.id;
     const isReligionEvent = evId === 'w_religion' || evId === 'h_religion';
+
     if (!p.hasUnlockedCultGod && isReligionEvent && beliefBefore === 0) {
       p.hasUnlockedCultGod = true;
       p.hiddenGoals = [...(p.hiddenGoals || []), '邪教上帝'];
-      addLog(`✨ ${p.name} 觸發隱藏目標【邪教上帝】：在信念為 0 時接受宗教宣傳，若之後使用「奉獻」達 10 次且信念滿 100，即可成就邪教上帝！`);
+
+      addLog(
+        `✨ ${p.name} 觸發隱藏目標【邪教上帝】：在信念為 0 時接受宗教宣傳，若之後使用「奉獻」達 10 次且信念滿 100，即可成就邪教上帝！`
+      );
+
       cultGodJustUnlocked = p.name;
     }
 
@@ -1463,18 +2064,34 @@ const triggerSocialSubsidy = useCallback((reason = '財力不足') => {
 
   setActiveEvent(null);
 
+  // ✅ 若本次事件中有玩家剛解鎖邪教上帝，顯示隱藏目標提示 Popup
   if (cultGodJustUnlocked) {
     setHiddenGoalPopup({
       playerName: cultGodJustUnlocked,
       goalTitle: '邪教上帝',
-      message: '已觸發隱藏目標【邪教上帝】：之後若使用「奉獻」達 10 次且信念達 100，將成為邪教上帝。'
+      message:
+        '已觸發隱藏目標【邪教上帝】：之後若使用「奉獻」達 10 次且信念達 100，將成為邪教上帝。'
     });
   }
 
   setTimeout(() => {
-    passTurn(players);
+    // 用最新的 players 狀態決定下一位
+    setPlayers(prev => {
+      const next = [...prev];
+      passTurn(next);
+      return next;
+    });
   }, 100);
-};
+}, [
+  activeEvent,
+  setPlayers,
+  setActiveEvent,
+  setHiddenGoalPopup,
+  addLog,
+  passTurn,
+  notifyGoalProgress,
+  canStillPursueGoal,
+]);
 
 // 專給 AI 用的簡化道具列表（只包含 AI 決策需要的欄位）
 const AI_ITEMDATA = useMemo(
@@ -1491,6 +2108,8 @@ const AI_ITEMDATA = useMemo(
     { id: 'weed', price: 1000 },
     { id: 'donation', price: 1000 },
     { id: 'reportall', price: 3000 },
+    { id: 'phonefraud', price: 3000 },
+    { id: 'blessing', price: 500 },
   ],
   []
 );
@@ -1543,16 +2162,16 @@ const evaluateGoalProgress = useCallback(
 
     // 山大王（股份）：股份 + 財富
     const shareCount = (player.items || []).filter(it => it.id === 'companyshare').length;
-const sharePossible = shareCount <= 5;         // ✅ 0–5 張視為「仍在追山大王」
-if (sharePossible) {
-  const shareProgress = (shareCount / 5) * 70; // ✅ 以 6 張作為滿分進度
-  const wealthFactor = Math.min(player.wealth / 5000, 1) * 30;
-  goals.push({
-    goal: AI_GOALS.KING_OF_COMPANY,
-    possible: true,
-    progressScore: shareProgress + wealthFactor,
-  });
-}
+    const sharePossible = shareCount <= 5;         // 0–5 張視為「仍在追山大王」
+    if (sharePossible) {
+      const shareProgress = (shareCount / 5) * 70;
+      const wealthFactor = Math.min(player.wealth / 5000, 1) * 30;
+      goals.push({
+        goal: AI_GOALS.KING_OF_COMPANY,
+        possible: true,
+        progressScore: shareProgress + wealthFactor,
+      });
+    }
 
     // 瘋狂之王：社會福利次數 + 開啟後抽 weed 次數
     const subsidyCount = player.socialSubsidyCount || 0;
@@ -1577,7 +2196,7 @@ if (sharePossible) {
       progressScore: cultScore,
     });
 
-    // ====== 新：卷王 / 蛇王 / 地獄黑仔王（24圈 / 32次 / 20次） ======
+    // ====== 卷王 / 蛇王 / 地獄黑仔王 ======
     const w1 = player.work1Count || 0;
     const w2 = player.work2Count || 0;
     const w3 = player.work3Count || 0;
@@ -1589,8 +2208,8 @@ if (sharePossible) {
     const onlyWork1 =
       w2 === 0 && w3 === 0 && w4 === 0 && w5 === 0 && w1 > 0;
     if (onlyWork1) {
-      const countProgress = Math.min(w1 / 32, 1);   // 0~1
-      const lapProgress = Math.min(lap / 24, 1);   // 0~1
+      const countProgress = Math.min(w1 / 32, 1);
+      const lapProgress = Math.min(lap / 24, 1);
       const competitionScore = 20 + countProgress * 70 + lapProgress * 10;
       goals.push({
         goal: AI_GOALS.KING_OF_COMPETITION,
@@ -1731,16 +2350,16 @@ const evaluateMoveValue = useCallback(
 
 const evaluateBuyValue = useCallback(
   (ai, aiGoal) => {
-    if (ai.wealth < 2000) return 0; // 稍微放寬門檻，讓早期也會開始買
+    // 放寬門檻：只要有 1500 就開始認真考慮買關鍵卡
+    if (ai.wealth < 1500) return 0;
 
     const itemCount = (ai.items || []).length;
     let score = 0;
 
     // 基礎：錢多、道具少時越傾向購買
-    score += (ai.wealth - 1500) * 0.02;     // 錢越多越想買
+    score += (ai.wealth - 1000) * 0.02;
     score += Math.max(0, 6 - itemCount) * 4;
 
-    // 三個「必需道具」目標：給一致較高加成
     if (
       aiGoal === AI_GOALS.CULT_GOD ||
       aiGoal === AI_GOALS.MAD_KING ||
@@ -1748,7 +2367,11 @@ const evaluateBuyValue = useCallback(
     ) {
       score += 15;
     } else {
-      // 其他五條線：仍可買，但偏好較低
+      score += 10;
+    }
+
+    // ✅ 額外：信念很低時，提高整體購物意願（尤其是會買祈福三寶）
+    if (ai.belief < 30) {
       score += 10;
     }
 
@@ -1756,6 +2379,7 @@ const evaluateBuyValue = useCallback(
   },
   [AI_GOALS]
 );
+
 
 // 挑出目前最值得使用的一張道具（若有）
 const pickBestItemToUse = useCallback(
@@ -1766,19 +2390,15 @@ const pickBestItemToUse = useCallback(
     // 先做「硬排斥」過濾：完全不能用的道具
     items = items.filter(it => {
       if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
-        // 蛇王：不能用 companyhome（會去 work1）
         if (it.id === 'companyhome') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_WORK) {
-        // 打工皇帝：不能用 shorttrip / longholiday（傳假日）
         if (it.id === 'shorttrip' || it.id === 'longholiday') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
-        // King of Leisure：不能用 companyhome / overtime（傳工作日）
         if (it.id === 'companyhome' || it.id === 'overtime') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
-        // 卷王：不能用 overtime（傳 work5）
         if (it.id === 'overtime') return false;
       }
       return true;
@@ -1869,25 +2489,22 @@ const pickBestItemToUse = useCallback(
           score += 15;
         }
       } else if (it.id === 'overtime') {
-        // 能走到這裡的情況：不是卷王、不是 King of Leisure
         score = 15;
         if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
-          score += 20; // 蛇王喜歡
+          score += 20;
         } else if (aiGoal === AI_GOALS.BAD_LUCK_KING) {
           score += 10;
         }
       } else if (it.id === 'companyhome') {
-        // 能走到這裡：不是蛇王、不是 King of Leisure
         score = 10;
         if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
-          score += 25; // 卷王
+          score += 25;
         } else if (aiGoal === AI_GOALS.BAD_LUCK_KING) {
-          score += 20; // 黑仔王
+          score += 20;
         } else if (aiGoal === AI_GOALS.KING_OF_WORK) {
           score += 10;
         }
       } else if (it.id === 'shorttrip' || it.id === 'longholiday') {
-        // 能走到這裡：不是打工皇帝
         score = 10;
         if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
           score += 20;
@@ -1915,19 +2532,15 @@ const tryBuyUsefulItem = useCallback(
     // 硬排斥：完全不應購買的道具
     affordable = affordable.filter(item => {
       if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
-        // 蛇王：不買 companyhome
         if (item.id === 'companyhome') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_WORK) {
-        // 打工皇帝：不買 shorttrip / longholiday
         if (item.id === 'shorttrip' || item.id === 'longholiday') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
-        // King of Leisure：不買 companyhome / overtime
         if (item.id === 'companyhome' || item.id === 'overtime') return false;
       }
       if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
-        // 卷王：不買 overtime
         if (item.id === 'overtime') return false;
       }
       return true;
@@ -1942,36 +2555,42 @@ const tryBuyUsefulItem = useCallback(
         'companyshare',
         'longinvestment',
         'reportall',
+        'phonefraud',
         'borrownotreturn',
         'workunload',
         'companyhome',
         'overtime',
         'longholiday',
         'shorttrip',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.CULT_GOD) {
       priorityOrder = [
         'donation',
         'longinvestment',
         'reportall',
+        'phonefraud',
         'borrownotreturn',
         'workunload',
         'shorttrip',
         'longholiday',
         'companyhome',
         'overtime',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.MAD_KING) {
       priorityOrder = [
         'weed',
         'longinvestment',
         'reportall',
+        'phonefraud',
         'borrownotreturn',
         'workunload',
         'shorttrip',
         'longholiday',
         'companyhome',
         'overtime',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_WORK) {
       priorityOrder = [
@@ -1981,7 +2600,8 @@ const tryBuyUsefulItem = useCallback(
         'workunload',
         'borrownotreturn',
         'reportall',
-        // shorttrip/longholiday 已被 filter 掉
+        'phonefraud',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
       priorityOrder = [
@@ -1991,7 +2611,8 @@ const tryBuyUsefulItem = useCallback(
         'workunload',
         'borrownotreturn',
         'reportall',
-        // companyhome / overtime 已被 filter 掉
+        'phonefraud',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
       priorityOrder = [
@@ -2002,7 +2623,8 @@ const tryBuyUsefulItem = useCallback(
         'workunload',
         'borrownotreturn',
         'reportall',
-        // overtime 已被 filter 掉
+        'phonefraud',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
       priorityOrder = [
@@ -2013,11 +2635,13 @@ const tryBuyUsefulItem = useCallback(
         'workunload',
         'borrownotreturn',
         'reportall',
-        // companyhome 已被 filter 掉
+        'phonefraud',
+        'blessing',
       ];
     } else if (aiGoal === AI_GOALS.BAD_LUCK_KING) {
       priorityOrder = [
         'longinvestment',
+        'blessing',
         'companyhome',
         'longholiday',
         'overtime',
@@ -2025,6 +2649,7 @@ const tryBuyUsefulItem = useCallback(
         'workunload',
         'borrownotreturn',
         'reportall',
+        'phonefraud',
       ];
     } else {
       priorityOrder = [
@@ -2037,6 +2662,8 @@ const tryBuyUsefulItem = useCallback(
         'longholiday',
         'companyhome',
         'overtime',
+        'phonefraud',
+        'blessing',
       ];
     }
 
@@ -2051,7 +2678,8 @@ const tryBuyUsefulItem = useCallback(
     if (!pick) pick = affordable[0];
     if (!pick) return false;
 
-    if (ai.wealth - pick.price < 1000) return false;
+    // 保留至少 500 元現金，不會把自己花到太窮
+    if (ai.wealth - pick.price < 500) return false;
 
     handleBuyItem(pick, 1);
     return true;
@@ -2068,6 +2696,8 @@ const maybeBuyBeforeAction = useCallback(
   [evaluateBuyValue, tryBuyUsefulItem]
 );
 
+// ==================== AI 回合主控 ====================
+
 const runAI = useCallback(
   (idx) => {
     const ai = players[idx];
@@ -2075,11 +2705,13 @@ const runAI = useCallback(
 
     const aiGoal = pickBestGoalForAI(ai, players);
 
+    // 1. 回合前可能先買卡
     maybeBuyBeforeAction(ai, aiGoal);
 
     const updated = players[idx];
     if (!updated || !updated.isAI || updated.isFinished) return;
 
+    // 2. 決定是否先用道具
     const bestItemAction = pickBestItemToUse(updated, idx, aiGoal);
     const moveScore = evaluateMoveValue(updated, aiGoal);
 
@@ -2088,7 +2720,210 @@ const runAI = useCallback(
       return;
     }
 
-    const steps = Math.floor(Math.random() * 6) + 1;
+    // --- 目標進度與「是否還需要特化」的判斷 ---
+
+    const w1 = updated.work1Count || 0;
+    const w5 = updated.work5Count || 0;
+    const negEvents = updated.negativeEventsCount || 0;
+
+    // 這裡要用你真實的門檻，暫以 32 次為例（你 check 勝利條件時用的數值）
+    const WORK1_TARGET = 32;
+    const WORK5_TARGET = 32;
+    const BADLUCK_TARGET = 20; // 例如負面事件 20 次
+
+    const needWork1Focus = aiGoal === AI_GOALS.KING_OF_COMPETITION && w1 < WORK1_TARGET;
+    const needWork5Focus = aiGoal === AI_GOALS.SLACK_OFF_KING && w5 < WORK5_TARGET;
+    const needBadLuckFocus = aiGoal === AI_GOALS.BAD_LUCK_KING && negEvents < BADLUCK_TARGET;
+
+    // 3. 根據目標和體力，決定移動步數（代表性步數 + 評分）
+    let steps;
+
+    // 3.1 計算最大可行步數（含病假），並設一個硬上限，避免爆計算
+    // 這裡假設最多考慮 30 格（剛好一圈）
+    let maxVirtualSteps = getMaxStepsWithSickLeave
+      ? getMaxStepsWithSickLeave(updated, 40)
+      : 6; // 如果沒引入該函式，就保守用 6
+    if (!Number.isFinite(maxVirtualSteps) || maxVirtualSteps < 1) {
+      maxVirtualSteps = 1;
+    }
+    const maxConsiderSteps = Math.min(maxVirtualSteps, 30);
+
+    // 3.2 準備候選步數集合
+    const candidateSteps = new Set();
+    const curPos = updated.pos ?? 0;
+
+    // 永遠考慮 1–6（本地微調，讓 AI 不會太呆）
+    for (let s = 1; s <= Math.min(6, maxConsiderSteps); s++) {
+      candidateSteps.add(s);
+    }
+
+    // 3.3 掃描 1..maxConsiderSteps，找一些「戰略步數」
+    let foundWork1ForComp = false;
+    let foundWork5ForSlack = false;
+    let foundHolidayForLeisure = false;
+
+    for (let s = 1; s <= maxConsiderSteps; s++) {
+      const pos = (curPos + s) % TOTAL_CELLS;
+      const prevPos = (curPos + s - 1 + TOTAL_CELLS) % TOTAL_CELLS;
+      const cell = BOARD_CELLS[pos];
+
+      // a) 跨起點那步（完成一圈拿薪金）必加
+      if (prevPos !== 0 && pos === 0) {
+        candidateSteps.add(s);
+      }
+
+      // b) 卷王：優先對齊最近的「工作日1」（只在目標未滿足時）
+      if (
+        needWork1Focus &&
+        !foundWork1ForComp &&
+        cell.type === 'work' &&
+        cell.name === '工作日1'
+      ) {
+        candidateSteps.add(s);
+        foundWork1ForComp = true;
+      }
+
+      // c) 蛇王：優先對齊最近的「工作日5」（只在目標未滿足時）
+      if (
+        needWork5Focus &&
+        !foundWork5ForSlack &&
+        cell.type === 'work' &&
+        cell.name === '工作日5'
+      ) {
+        candidateSteps.add(s);
+        foundWork5ForSlack = true;
+      }
+
+      // d) King of Leisure：最近的假日（這個本來就是圈王型目標，不需要門檻）
+      if (
+        !foundHolidayForLeisure &&
+        aiGoal === AI_GOALS.KING_OF_LEISURE &&
+        cell.holiday
+      ) {
+        candidateSteps.add(s);
+        foundHolidayForLeisure = true;
+      }
+
+      // 卷王 / 蛇王 / King of Leisure 三種特化都找到後，可提早結束掃描
+      if (
+        foundWork1ForComp &&
+        foundWork5ForSlack &&
+        foundHolidayForLeisure
+      ) {
+        break;
+      }
+    }
+
+    // 如果 candidateSteps 竟然是空的，就保底用 1 步
+    if (candidateSteps.size === 0) {
+      candidateSteps.add(1);
+    }
+
+    // 3.4 用 evaluateMoveValue 對候選步數逐個評分，選最高分
+    let bestScore = -Infinity;
+    let bestSteps = 1;
+
+    for (const s of candidateSteps) {
+      // 簡單模擬走 s 格後的狀態（不需要完整動畫，只估大致狀態）
+      let sim = { ...updated };
+      let stamina = sim.stamina ?? 100;
+      let stress = sim.stress ?? 0;
+      let spirit = sim.spirit ?? 80;
+      let wealth = sim.wealth ?? 0;
+      let pos = sim.pos ?? 0;
+      let lap = sim.lap ?? 0;
+
+      for (let i = 0; i < s; i++) {
+        const nextPos = (pos + 1) % TOTAL_CELLS;
+        const cell = BOARD_CELLS[nextPos];
+        const cost = cell.cost || 0;
+
+        // 粗略扣體力 / 壓力 / 精神（不模擬放病假細節，避免爆算）
+        stamina = clamp(stamina - cost, 0, 100);
+        stress = clamp(stress + cost, 0, 100);
+        spirit = clamp(spirit - cost, 0, 100);
+
+        // 跨起點加薪
+        if (pos !== 0 && nextPos === 0) {
+          lap += 1;
+          wealth = clamp(wealth + 500, 0, 10000);
+        }
+
+        pos = nextPos;
+      }
+
+      sim = {
+        ...sim,
+        stamina,
+        stress,
+        spirit,
+        wealth,
+        pos,
+        lap,
+      };
+
+      let score = evaluateMoveValue(sim, aiGoal);
+
+      const finalCell = BOARD_CELLS[pos];
+      const finalCost = finalCell.cost || 0;
+
+      // --- 特化偏好：只在目標未滿足時生效 ---
+
+      // 卷王：未達成前，落在工作日1 再加分
+      if (
+        needWork1Focus &&
+        finalCell.type === 'work' &&
+        finalCell.name === '工作日1'
+      ) {
+        score += 8; // 可按測試調整
+      }
+
+      // 蛇王：未達成前，落在工作日5 再加分
+      if (
+        needWork5Focus &&
+        finalCell.type === 'work' &&
+        finalCell.name === '工作日5'
+      ) {
+        score += 8;
+      }
+
+      // 地獄黑仔王：未達成前，若落在 cost 5 且卡池負面比例高，給額外加分
+      if (needBadLuckFocus && finalCost === 5) {
+        let negativeRatio = 0;
+
+        if (finalCell.type === 'work') {
+          const total = workDeck.length;
+          if (total > 0) {
+            const negCount = workDeck.filter(card =>
+              WORK_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
+            ).length;
+            negativeRatio = negCount / total;
+          }
+        } else if (finalCell.holiday) {
+          const total = holidayDeck.length;
+          if (total > 0) {
+            const negCount = holidayDeck.filter(card =>
+              HOLIDAY_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
+            ).length;
+            negativeRatio = negCount / total;
+          }
+        }
+
+        // 只有當負面比例夠高時，才願意特別衝 cost 5
+        if (negativeRatio >= 0.5) {
+          score += 10 * negativeRatio; // 最多大約 +10，可視需要調整
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestSteps = s;
+      }
+    }
+
+    steps = bestSteps;
+
+    // 3.5 執行實際移動
     handleMove(steps);
   },
   [
@@ -2099,11 +2934,18 @@ const runAI = useCallback(
     pickBestGoalForAI,
     handleUseItem,
     handleMove,
+    getMaxStepsWithSickLeave,
+    AI_GOALS,
+    workDeck,
+    holidayDeck,
   ]
 );
 
+// ==================== UI / 回合觸發 ====================
+
 useEffect(() => logEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [logs]);
 
+// 當輪到 AI 且沒有移動 / 事件 / 抽牌時，自動在 1.2 秒後啟動 AI 回合
 useEffect(() => {
   if (gameState !== 'playing' || isMoving || isProcessing || activeEvent || viewingDeck) return;
   const currentPlayer = players[turnIndex];
@@ -2122,22 +2964,19 @@ useEffect(() => {
   runAI,
 ]);
 
+// 落格恢復 + 事件流程：由 pendingRecovery 決定要處理哪位玩家
 useEffect(() => {
   if (!pendingRecovery) return;
-  const { playerIndex, source } = pendingRecovery;
+  const { playerIndex } = pendingRecovery;
 
+  // move / subsidy 一視同仁，都經過這裡做恢復與事件
   handleRecoveryAndEvent(playerIndex);
 
-  if (source === 'subsidy') {
-    setTimeout(() => passTurn(players), 600);
-  }
-
+  // 回合實際切換交由 applyEventEffect 的 passTurn 統一處理
   setPendingRecovery(null);
 }, [
   pendingRecovery,
-  players,
   handleRecoveryAndEvent,
-  passTurn,
 ]);
 
   if (gameState === 'setup') {
@@ -2309,6 +3148,70 @@ if (gameState === 'gameover') {
           </div>
         </div>
 
+        {/* ====== 留言板 Icon（右下角） ====== */}
+        <div className="absolute bottom-4 right-4 z-40">
+          <button
+            onClick={() => {
+              const currentPlayer = players[turnIndex];
+              if (currentPlayer) {
+                markAllMessagesReadBy(currentPlayer.id);
+              }
+              setShowMessageBoard(v => !v);
+            }}
+            className="relative bg-slate-900 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-slate-800 transition"
+          >
+            💬
+            {hasUnreadForAnyPlayer && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
+            )}
+          </button>
+        </div>
+
+        {/* ====== 留言板 Panel ====== */}
+        {showMessageBoard && (
+          <div className="absolute bottom-16 right-4 w-72 max-h-80 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl flex flex-col z-40">
+            <div className="px-3 py-2 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+              <span className="text-xs font-semibold text-slate-100">留言板</span>
+              <button
+                className="text-[10px] text-slate-400 hover:text-slate-200"
+                onClick={() => setShowMessageBoard(false)}
+              >
+                關閉
+              </button>
+            </div>
+
+            {/* 可捲動的留言內容 */}
+            <div className="flex-1 overflow-y-auto px-3 py-2 text-[11px] space-y-1 bg-slate-950">
+              {messages.length === 0 && (
+                <div className="text-slate-500">目前沒有任何留言。</div>
+              )}
+              {messages.map(m => {
+                const sender = players.find(p => p.id === m.senderId);
+                return (
+                  <div key={m.id} className="border-b border-slate-800 pb-1 mb-1">
+                    <div className="font-semibold text-[10px] text-slate-400">
+                      {sender ? sender.name : '未知玩家'}
+                    </div>
+                    <div className="text-[11px] text-slate-100 whitespace-pre-wrap">
+                      {m.text}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 簡單輸入區 */}
+            <MessageInput
+              onSend={text => {
+                const currentPlayer = players[turnIndex];
+                if (!currentPlayer) return;
+                if (!text.trim()) return;
+                addMessage(text.trim(), currentPlayer.id);
+              }}
+            />
+          </div>
+        )}
+
         {/* ====== 隨機事件 Modal ====== */}
         {activeEvent && (() => {
           const isNegativeEvent = activeEvent.isWork
@@ -2381,66 +3284,83 @@ if (gameState === 'gameover') {
         })()}
 
         {/* ====== 事件卡池查看 Modal ====== */}
-        {viewingDeck && (
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="w-[500px] max-h-[80vh] flex flex-col bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
-              <div
-                className={`py-4 flex justify-between items-center px-6 ${
-                  viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'
-                }`}
-              >
-                <span className="text-sm font-black text-white tracking-widest uppercase">
-                  {viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}
-                </span>
-                <span className="text-xs font-black text-white/80">
-                  剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}
-                </span>
-              </div>
+{viewingDeck && (
+  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="w-[500px] max-h-[80vh] flex flex-col bg-slate-900 border-2 border-slate-700 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div
+        className={`py-4 flex justify-between items-center px-6 ${
+          viewingDeck === 'work' ? 'bg-blue-600' : 'bg-emerald-600'
+        }`}
+      >
+        <span className="text-sm font-black text-white tracking-widest uppercase">
+          {viewingDeck === 'work' ? '工作日事件卡池' : '假日事件卡池'}
+        </span>
+        <span className="text-xs font-black text-white/80">
+          剩餘: {viewingDeck === 'work' ? workDeck.length : holidayDeck.length}
+        </span>
+      </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950">
-                {(viewingDeck === 'work' ? workDeck : holidayDeck).map((card, i) => (
-                  <div key={i} className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-                    <h4 className="text-sm font-black text-slate-200 mb-1">{card.title}</h4>
-                    <p className="text-[11px] text-slate-400 font-bold mb-3">{card.desc}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(card.effect).map(([k, v]) => (
-                        <span
-                          key={k}
-                          className={`text-[10px] px-2 py-0.5 rounded font-black ${
-                            v > 0
-                              ? 'bg-emerald-950/50 text-emerald-400'
-                              : 'bg-rose-950/50 text-rose-400'
-                          }`}
-                        >
-                          {k === 'wealth'
-                            ? '財力'
-                            : k === 'stamina'
-                            ? '體力'
-                            : k === 'stress'
-                            ? '壓力'
-                            : k === 'spirit'
-                            ? '精神'
-                            : '信念'}{' '}
-                          {v > 0 ? '+' : ''}
-                          {v}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950">
+        {(viewingDeck === 'work' ? workDeck : holidayDeck).map((card, i) => {
+          const polarity = getEventPolarity(card);
+          const cardBgClass =
+            polarity === 'positive'
+              ? 'bg-emerald-700 border-emerald-400'  // ✅ 明顯綠底
+              : polarity === 'negative'
+              ? 'bg-rose-700 border-rose-400'        // ✅ 明顯紅底
+              : 'bg-slate-900 border-slate-800';
+
+          return (
+            <div
+              key={i}
+              className={`p-4 rounded-xl border ${cardBgClass}`}
+            >
+              <h4 className="text-sm font-black text-white mb-1">
+                {card.title}
+              </h4>
+              <p className="text-[11px] text-slate-100 font-bold mb-3 whitespace-pre-line">
+                {card.desc}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(card.effect).map(([k, v]) => (
+                  <span
+                    key={k}
+                    className={`text-[10px] px-2 py-0.5 rounded font-black ${
+                      v > 0
+                        ? 'bg-emerald-300 text-emerald-900'  // ✅ 高對比正向標籤
+                        : 'bg-rose-300 text-rose-900'        // ✅ 高對比負向標籤
+                    }`}
+                  >
+                    {k === 'wealth'
+                      ? '財力'
+                      : k === 'stamina'
+                      ? '體力'
+                      : k === 'stress'
+                      ? '壓力'
+                      : k === 'spirit'
+                      ? '精神'
+                      : '信念'}{' '}
+                    {v > 0 ? '+' : ''}
+                    {v}
+                  </span>
                 ))}
               </div>
-
-              <div className="p-4 bg-slate-900 border-t border-slate-800">
-                <button
-                  onClick={() => setViewingDeck(null)}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest"
-                >
-                  關閉視窗
-                </button>
-              </div>
             </div>
-          </div>
-        )}
+          );
+        })}
+      </div>
+
+      <div className="p-4 bg-slate-900 border-t border-slate-800">
+        <button
+          onClick={() => setViewingDeck(null)}
+          className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest"
+        >
+          關閉視窗
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* ====== 道具卡商店 Modal ====== */}
         {showShop && (
@@ -2851,26 +3771,60 @@ function NamingScreen({ players, setPlayers, onFinalize }) {
   );
 }
 
+function MessageInput({ onSend }) {
+  const [value, setValue] = useState('');
+
+  const handleSend = () => {
+    if (!value.trim()) return;
+    onSend(value.trim());
+    setValue('');
+  };
+
+  return (
+    <div className="border-t border-slate-800 px-2 py-1.5 flex gap-1 bg-slate-900">
+      <input
+        type="text"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+        placeholder="輸入留言..."
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSend();
+          }
+        }}
+      />
+      <button
+        onClick={handleSend}
+        className="px-2 py-1 bg-blue-500 hover:bg-blue-400 text-white text-[11px] rounded-lg font-bold"
+      >
+        發送
+      </button>
+    </div>
+  );
+}
+
 function GameOverScreen({ players }) {
   const winner = players.find(p => p.victoryTitle);
 
   // 依不同成就選擇圖片（放在 public/picture 底下）
 const victoryImage = winner?.victoryTitle === "King of Leisure"
-  ? process.env.PUBLIC_URL + "/picture_kingofleisure.png"
+  ? process.env.PUBLIC_URL + "/picture/kingofleisure.png"
   : winner?.victoryTitle === "打工皇帝"
-  ? process.env.PUBLIC_URL + "/picture_kingofwork.png"
+  ? process.env.PUBLIC_URL + "/picture/kingofwork.png"
   : winner?.victoryTitle === "山大王"
-  ? process.env.PUBLIC_URL + "/picture_kingofcompany.png"
-  : winner?.victoryTitle === "瘋狂之王"
-  ? process.env.PUBLIC_URL + "/picture_madking.png"
+  ? process.env.PUBLIC_URL + "/picture/kingofcompany.png"
+  : winner?.victoryTitle === "瘋王"
+  ? process.env.PUBLIC_URL + "/picture/madking.png"
   : winner?.victoryTitle === "邪教上帝"
-  ? process.env.PUBLIC_URL + "/picture_cultgod.png"
-  : winner?.victoryTitle === "King of Competition"
-  ? process.env.PUBLIC_URL + "/picture_kingofcompetition.png"
-  : winner?.victoryTitle === "Slack Off King"
-  ? process.env.PUBLIC_URL + "/picture_slackoffking.png"
-  : winner?.victoryTitle === "Bad Luck King"
-  ? process.env.PUBLIC_URL + "/picture_badluckking.png"
+  ? process.env.PUBLIC_URL + "/picture/cultgod.png"
+  : winner?.victoryTitle === "卷王"
+  ? process.env.PUBLIC_URL + "/picture/kingofcompetition.png"
+  : winner?.victoryTitle === "蛇王"
+  ? process.env.PUBLIC_URL + "/picture/slackoffking.png"
+  : winner?.victoryTitle === "地獄黑仔王"
+  ? process.env.PUBLIC_URL + "/picture/badluckking.png"
   : null;
 
   // 不同成就專屬祝賀訊息
