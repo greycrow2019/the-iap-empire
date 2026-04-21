@@ -235,7 +235,7 @@ const ITEM_DATA = [
   id: 'blessing',
   title: '<祈福三寶>',
   price: 1500,
-  desc: '暫時提升信念 30，持續一圈。',
+  desc: '暫時提升信念 50，持續一圈。',
   imageUrl: process.env.PUBLIC_URL + '/picture/blessing.png',
   requiresTarget: false,
 },
@@ -1578,13 +1578,13 @@ const runRecoveryOnce = useCallback(
           p.belief = clamp(p.belief - p.blessingBonus, 0, 100);
         }
 
-        p.blessingBonus = 30;
-        p.belief = clamp(p.belief + 30, 0, 100);
+        p.blessingBonus = 50;
+        p.belief = clamp(p.belief + 50, 0, 100);
         p.blessingExpireLap = p.lap + 1;
         p.items = p.items.filter((_, i) => i !== itemIdx);
 
         addLog(
-          `🕯️ ${p.name} 使用「祈福三寶」，信念暫時提升 30，持續一圈。`
+          `🕯️ ${p.name} 使用「祈福三寶」，信念暫時提升 50，持續一圈。`
         );
 
         next[playerIdx] = p;
@@ -2886,7 +2886,7 @@ const pickBestItemToUse = useCallback(
         // 祝福：補信念 buff，特別適合邪教上帝 / 信念低
         let s = 0;
 
-        if (ai.belief <= 40) {
+        if (ai.belief <= 10) {
           s += 50 + (40 - ai.belief);
         }
 
@@ -2992,29 +2992,39 @@ if (perLapIncome >= 3000) {
       priorityOrder = [
         'companyshare',
         'longinvestment',
-        'reportall',
         'phonefraud',
+        'reportall',
         'borrownotreturn',
         'workunload',
+        'steakfeast',
+        'toughitout',
         'companyhome',
         'overtime',
         'longholiday',
         'shorttrip',
+        'weed',
         'blessing',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.CULT_GOD) {
       priorityOrder = [
         'donation',
+        'blessing',
         'longinvestment',
         'reportall',
         'phonefraud',
         'borrownotreturn',
         'workunload',
+        'steakfeast',
+        'toughitout',
         'shorttrip',
         'longholiday',
         'companyhome',
         'overtime',
-        'blessing',
+        'weed',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.MAD_KING) {
       priorityOrder = [
@@ -3024,33 +3034,50 @@ if (perLapIncome >= 3000) {
         'phonefraud',
         'borrownotreturn',
         'workunload',
+        'donation',
+        'toughitout',
+        'steakfeast',
         'shorttrip',
         'longholiday',
         'companyhome',
         'overtime',
         'blessing',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_WORK) {
       priorityOrder = [
         'longinvestment',
         'companyhome',
         'overtime',
+        'weed',
+        'toughitout',
         'workunload',
         'borrownotreturn',
         'reportall',
         'phonefraud',
+        'steakfeast',
+        'donation',
         'blessing',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
       priorityOrder = [
         'longinvestment',
         'longholiday',
         'shorttrip',
+        'donation',
+        'blessing',
+        'weed',
         'workunload',
         'borrownotreturn',
         'reportall',
         'phonefraud',
-        'blessing',
+        'toughitout',
+        'steakfeast',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
       priorityOrder = [
@@ -3058,11 +3085,17 @@ if (perLapIncome >= 3000) {
         'longinvestment',
         'longholiday',
         'shorttrip',
+        'toughitout',
+        'weed',
+        'donation',
         'workunload',
         'borrownotreturn',
         'reportall',
         'phonefraud',
+        'steakfeast',
         'blessing',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
       priorityOrder = [
@@ -3070,11 +3103,17 @@ if (perLapIncome >= 3000) {
         'longinvestment',
         'longholiday',
         'shorttrip',
+        'weed',
+        'donation',
         'workunload',
         'borrownotreturn',
         'reportall',
         'phonefraud',
+        'toughitout',
+        'steakfeast',
         'blessing',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else if (aiGoal === AI_GOALS.BAD_LUCK_KING) {
       priorityOrder = [
@@ -3082,16 +3121,25 @@ if (perLapIncome >= 3000) {
         'blessing',
         'companyhome',
         'longholiday',
+        'donation',
+        'weed',
+        'toughitout',
         'overtime',
         'shorttrip',
         'workunload',
         'borrownotreturn',
         'reportall',
         'phonefraud',
+        'steakfeast',
+        'companyshare',
+        'moneyinyourpocket',
       ];
     } else {
       priorityOrder = [
         'longinvestment',
+        'toughitout',
+        'weed',
+        'donation',
         'reportall',
         'borrownotreturn',
         'workunload',
@@ -3101,7 +3149,9 @@ if (perLapIncome >= 3000) {
         'companyhome',
         'overtime',
         'phonefraud',
+        'steakfeast',
         'blessing',
+        'moneyinyourpocket',
       ];
     }
 
