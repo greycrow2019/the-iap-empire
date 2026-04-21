@@ -187,7 +187,7 @@ const ITEM_DATA = [
     id: 'weed',
     title: '<大麻>',
     price: 500,
-    desc: '使用後壓力 -100（最低0），體力+30。',
+    desc: '麻醉自己，短暫逃避現實，使用後壓力 -100（最低0），體力+40，精神+50，信念-10。',
     imageUrl: process.env.PUBLIC_URL + '/picture/weed.png',
     requiresTarget: false
   },
@@ -195,7 +195,7 @@ const ITEM_DATA = [
     id: 'donation',
     title: '<奉獻>',
     price: 500,
-    desc: '使用後信念 +10（最高100），精神+20，向宗教組織奉獻後心靈踏實。',
+    desc: '使用後信念 +20（最高100），精神+20，壓力-30，向宗教組織奉獻後心靈踏實。',
     imageUrl: process.env.PUBLIC_URL + '/picture/donation.png',
     requiresTarget: false
   },
@@ -307,6 +307,8 @@ export default function App() {
   const [activeEvent, setActiveEvent] = useState(null);
   const [customSteps, setCustomSteps] = useState(1);
   const [viewingDeck, setViewingDeck] = useState(null);
+  const [hasProcessedRecoveryThisTurn, setHasProcessedRecoveryThisTurn] = useState(false);
+  const lastDrawTsRef = useRef(null);
 
   // 道具相關 state
   const [showShop, setShowShop] = useState(false);          // 是否顯示商店
@@ -436,72 +438,79 @@ export default function App() {
 
   const finalizeStart = () => {
   setPlayers(prev =>
-    prev.map(p => ({ 
-      ...p, 
-      pos: 0, 
-      lap: 0, 
-      isFinished: false, 
-      stamina: 100, 
-      wealth: 1500, 
-      stress: 0, 
-      spirit: 80, 
-      belief: 30,
-      hasLandedOnWork: false, 
-      hasLandedOnHoliday: false, 
-      victoryTitle: null,
-      items: [],
-      longInvestmentBonus: 0,
-      hasUsedWeed: false,        // 是否使用過大麻
-      work1Count: 0,
-      work2Count: 0,
-      work3Count: 0,
-      work4Count: 0,
-      work5Count: 0,
-      negativeEventsCount: 0,
-      hasPositiveOnWork1: false,
-      lastPlannedStopCellIndex: null,
-      skipCellResolveOnce: false,
+    prev.map(p => {
+      const base = { 
+        ...p, 
+        pos: 0, 
+        lap: 0, 
+        isFinished: false, 
+        stamina: 100, 
+        wealth: 1500, 
+        stress: 0, 
+        spirit: 80, 
+        belief: 30,
+        hasLandedOnWork: false, 
+        hasLandedOnHoliday: false, 
+        victoryTitle: null,
+        items: [],
+        longInvestmentBonus: 0,
+        hasUsedWeed: false,
+        work1Count: 0,
+        work2Count: 0,
+        work3Count: 0,
+        work4Count: 0,
+        work5Count: 0,
+        negativeEventsCount: 0,
+        hasPositiveOnWork1: false,
+        lastPlannedStopCellIndex: null,
+        skipCellResolveOnce: false,
 
-      // 祈福三寶相關欄位
-      blessingBonus: 0,
-      blessingExpireLap: null,
+        // 祈福三寶相關欄位
+        blessingBonus: 0,
+        blessingExpireLap: null,
 
-      // ★ 地獄黑仔王：在工作日1 抽到負面事件的次數
-      badLuckOnWork1Count: 0,
+        // 地獄黑仔王：在工作日1 抽到負面事件的次數
+        badLuckOnWork1Count: 0,
 
-      // ★ 第 8 部分：極端目標進度提示旗標（1/4, 1/2, 3/4）
-      // 卷王（work1 >= 32）
-      kingOfCompetitionNotified25: false,
-      kingOfCompetitionNotified50: false,
-      kingOfCompetitionNotified75: false,
+        // 極端目標進度提示旗標（1/4, 1/2, 3/4）
+        kingOfCompetitionNotified25: false,
+        kingOfCompetitionNotified50: false,
+        kingOfCompetitionNotified75: false,
 
-      // 蛇王（work5 >= 32）
-      slackOffKingNotified25: false,
-      slackOffKingNotified50: false,
-      slackOffKingNotified75: false,
+        slackOffKingNotified25: false,
+        slackOffKingNotified50: false,
+        slackOffKingNotified75: false,
 
-      // 地獄黑仔王（負面事件 >= 20，及工作日1負面次數）
-      badLuckKingNotified25: false,
-      badLuckKingNotified50: false,
-      badLuckKingNotified75: false,
-      badLuckKingNotified25_Work1: false,
-      badLuckKingNotified50_Work1: false,
-      badLuckKingNotified75_Work1: false,
+        badLuckKingNotified25: false,
+        badLuckKingNotified50: false,
+        badLuckKingNotified75: false,
+        badLuckKingNotified25_Work1: false,
+        badLuckKingNotified50_Work1: false,
+        badLuckKingNotified75_Work1: false,
 
-      // 瘋王（大麻次數 >= 10）
-      madKingNotified25: false,
-      madKingNotified50: false,
-      madKingNotified75: false,
+        madKingNotified25: false,
+        madKingNotified50: false,
+        madKingNotified75: false,
 
-      // 邪教上帝（奉獻次數 >= 10）
-      cultGodNotified25: false,
-      cultGodNotified50: false,
-      cultGodNotified75: false,
+        cultGodNotified25: false,
+        cultGodNotified50: false,
+        cultGodNotified75: false,
+      };
 
-      // AI 長期目標相關
-      goalPlan: null,
-      currentGoal: null,
-    }))
+      if (p.isAI) {
+        return {
+          ...base,
+          goalPlan: buildGoalPlanForAI(p),
+          currentGoal: null,
+        };
+      } else {
+        return {
+          ...base,
+          goalPlan: null,
+          currentGoal: null,
+        };
+      }
+    })
   );
 
   const allWorkEvents = [...WORK_POSITIVE_EVENTS, ...WORK_NEGATIVE_EVENTS];
@@ -792,6 +801,30 @@ const canStillPursueGoalForAI = useCallback(
   [players, canStillPursueGoal]
 );
 
+// ★ 計算「第 1 層目標」在某個狀態下還有多少可行（用於同層保留性）
+const countFirstLayerGoalsStillViable = useCallback(
+  (player, allPlayers, simulatedPlayerPatch = {}) => {
+    const plan = player.goalPlan;
+    if (!plan || plan.length === 0) return 0;
+
+    const firstLayer = plan[0]; // 第 1 層：山大王 + 打工/Leisure + 卷王/蛇王
+    if (!firstLayer || firstLayer.length === 0) return 0;
+
+    // 用 patch 模擬執行某個行動後的玩家狀態
+    const tempPlayer = { ...player, ...simulatedPlayerPatch };
+
+    let count = 0;
+    firstLayer.forEach(goalId => {
+      if (canStillPursueGoalForAI(tempPlayer, goalId)) {
+        count++;
+      }
+    });
+
+    return count;
+  },
+  [canStillPursueGoalForAI]
+);
+
 const drawCard = useCallback((isWork, cellCost = 0) => {
   const currentPlayer = players[turnIndex];
   const isHighStress = currentPlayer.stress > 80;
@@ -932,6 +965,189 @@ const handleBuyItem = useCallback(
     addLog(`🛒 ${buyer.name} 已購買 ${quantity} 張「${item.title}」`);
   },
   [players, turnIndex, companyShareSold, setPlayers, setCompanyShareSold, setGameState, addLog]
+);
+
+const handleRecoveryAndEvent = useCallback(
+  (playerIndex, recoveryTs) => {
+    setPlayers(prev => {
+      const next = [...prev];
+      let finalP = { ...next[playerIndex] };
+      const cell = BOARD_CELLS[finalP.pos];
+
+      // 略過一次落格結算
+      if (finalP.skipCellResolveOnce) {
+        finalP.skipCellResolveOnce = false;
+        next[playerIndex] = finalP;
+        return next;
+      }
+
+      // 先更新各種計數
+      if (cell.type === "work") {
+        if (cell.name === 1) {
+          finalP.work1Count = (finalP.work1Count || 0) + 1;
+
+          // ★ 卷王進度提示：僅在仍有機會追「卷王」時才提示
+          if (canStillPursueGoal(finalP, '卷王')) {
+            notifyGoalProgress(finalP, {
+              current: finalP.work1Count,
+              target: 32,
+              title: "卷王",
+              field25: "kingOfCompetitionNotified25",
+              field50: "kingOfCompetitionNotified50",
+              field75: "kingOfCompetitionNotified75",
+            });
+          }
+        } else if (cell.name === 2) {
+          finalP.work2Count = (finalP.work2Count || 0) + 1;
+        } else if (cell.name === 3) {
+          finalP.work3Count = (finalP.work3Count || 0) + 1;
+        } else if (cell.name === 4) {
+          finalP.work4Count = (finalP.work4Count || 0) + 1;
+        } else if (cell.name === 5) {
+          finalP.work5Count = (finalP.work5Count || 0) + 1;
+
+          // ★ 蛇王進度提示：僅在仍有機會追「蛇王」時才提示
+          if (canStillPursueGoal(finalP, '蛇王')) {
+            notifyGoalProgress(finalP, {
+              current: finalP.work5Count,
+              target: 32,
+              title: "蛇王",
+              field25: "slackOffKingNotified25",
+              field50: "slackOffKingNotified50",
+              field75: "slackOffKingNotified75",
+            });
+          }
+        }
+      }
+
+      const isWork = cell.type === "work";
+      const isHoliday = !!cell.holiday;
+      const cellCost = cell.cost || 0;
+
+      // === 在這裡處理 hasLandedOnWork / hasLandedOnHoliday 的更新邏輯 ===
+      if (isWork) {
+        finalP.hasLandedOnWork = true;
+      }
+
+      if (isHoliday) {
+        // 判斷「最後一圈被截停在起點假日」這個特例
+        const isAtStartHoliday = cell.id === 0;
+        const isLastLap = finalP.lap >= MAX_LAPS;
+
+        const plannedIndex = finalP.lastPlannedStopCellIndex;
+        const plannedCell = plannedIndex != null ? BOARD_CELLS[plannedIndex] : null;
+        const isPlannedWorkCell = plannedCell && plannedCell.type === "work";
+
+        const shouldIgnoreThisStartHoliday =
+          isLastLap && isAtStartHoliday && isPlannedWorkCell;
+
+        // 若是特例，就不要把 hasLandedOnHoliday 設成 true
+        if (!shouldIgnoreThisStartHoliday) {
+          finalP.hasLandedOnHoliday = true;
+        }
+      }
+
+      // === 極端稱號判定 ===
+      if (finalP.isFinished && !finalP.victoryTitle) {
+        const w1 = finalP.work1Count || 0;
+        const w2 = finalP.work2Count || 0;
+        const w3 = finalP.work3Count || 0;
+        const w4 = finalP.work4Count || 0;
+        const w5 = finalP.work5Count || 0;
+
+        // 1. 打工皇帝：整局都沒踩過假日格
+        if (!finalP.hasLandedOnHoliday) {
+          finalP.victoryTitle = "打工皇帝";
+        }
+        // 2. King of Leisure：整局都沒踩過工作日格
+        else if (!finalP.hasLandedOnWork) {
+          finalP.victoryTitle = "King of Leisure";
+        }
+
+        // 2. 卷王
+        const onlyWork1 =
+          w2 === 0 && w3 === 0 && w4 === 0 && w5 === 0 && w1 > 0;
+        if (
+          !finalP.victoryTitle &&
+          onlyWork1 &&
+          w1 >= 32
+        ) {
+          finalP.victoryTitle = "卷王";
+        }
+
+        // 3. 蛇王
+        const onlyWork5 =
+          w1 === 0 && w2 === 0 && w3 === 0 && w4 === 0 && w5 > 0;
+        if (
+          !finalP.victoryTitle &&
+          onlyWork5 &&
+          w5 >= 32
+        ) {
+          finalP.victoryTitle = "蛇王";
+        }
+
+        // 4. 地獄黑仔王
+        const negativeEvents = finalP.negativeEventsCount || 0;
+        const hasPositiveOnWork1 = !!finalP.hasPositiveOnWork1;
+        if (
+          !finalP.victoryTitle &&
+          negativeEvents >= 20 &&
+          !hasPositiveOnWork1 &&
+          (finalP.work1Count || 0) >= 10
+        ) {
+          finalP.victoryTitle = "地獄黑仔王";
+        }
+
+        if (finalP.victoryTitle) {
+          addLog(`${finalP.name} 達成 ${finalP.victoryTitle}`);
+          next[playerIndex] = finalP;
+          setTimeout(() => setGameState("gameover"), 1500);
+          return next;
+        }
+      }
+
+      // 這裡不要再重設 hasLandedOnWork / hasLandedOnHoliday 了
+      // if (isWork) finalP.hasLandedOnWork = true;
+      // if (isHoliday) finalP.hasLandedOnHoliday = true;
+
+      if (isHoliday) {
+        const recover = 10;
+        finalP.stamina = clamp(finalP.stamina + recover, 0, 100);
+        finalP.spirit  = clamp(finalP.spirit + recover, 0, 100);
+        finalP.stress  = clamp(finalP.stress - recover, 0, 100);
+        addLog(`🌴 ${finalP.name} 在假日停歇恢復狀態。`);
+      }
+
+      next[playerIndex] = finalP;
+
+      setTimeout(() => {
+        // ★ Strict Mode 去重：同一個 pendingRecovery ts 只允許抽一次卡
+        if (lastDrawTsRef.current === recoveryTs) {
+          return;
+        }
+        lastDrawTsRef.current = recoveryTs;
+
+        const ev = drawCard(isWork, cellCost);
+        setActiveEvent({ playerIndex, event: ev, isWork });
+      }, 300);
+
+      return next;
+    });
+  },
+  [setPlayers, drawCard, setActiveEvent, addLog, notifyGoalProgress, canStillPursueGoal]
+);
+
+const runRecoveryOnce = useCallback(
+  (recovery) => {
+    const { playerIndex, ts: recoveryTs } = recovery;
+
+    if (hasProcessedRecoveryThisTurn) {
+      return;
+    }
+    setHasProcessedRecoveryThisTurn(true);
+    handleRecoveryAndEvent(playerIndex, recoveryTs);
+  },
+  [hasProcessedRecoveryThisTurn, handleRecoveryAndEvent]
 );
 
   const handleUseItem = useCallback(
@@ -1239,8 +1455,10 @@ const handleBuyItem = useCallback(
       setPlayers(prev => {
         const next = [...prev];
         const p = { ...next[playerIdx] };
-        p.stamina = clamp(p.stamina + 30, 0, 100);
+        p.stamina = clamp(p.stamina + 40, 0, 100);
         p.stress = clamp(p.stress - 100, 0, 100);
+        p.spirit = clamp(p.spirit + 50, 0, 100);
+        p.belief = clamp(p.belief - 10, 0, 100);
         p.hasUsedWeed = true;
 
         if (p.hasUnlockedMadKing) {
@@ -1300,7 +1518,8 @@ const handleBuyItem = useCallback(
         const p = { ...next[playerIdx] };
         p.items = p.items.filter((_, i) => i !== itemIdx);
         p.spirit = clamp(p.spirit + 20, 0, 100);
-        p.belief = clamp(p.belief + 10, 0, 100);
+        p.belief = clamp(p.belief + 20, 0, 100);
+        p.stress = clamp(p.stress - 30, 0, 100);
         p.donationUseCount = (p.donationUseCount || 0) + 1;
         addLog(
           `⛪ ${p.name} 使用「奉獻」，信念 +10（最高 100），精神+20。`
@@ -1565,21 +1784,24 @@ const handleApplyTargetEffect = useCallback(
   [turnIndex, setPlayers, setShowTargetSelector, setPendingRecovery, addLog]
 );
 
-const passTurn = useCallback((cur) => {
-  if (cur.some(p => p.victoryTitle) || cur.every(p => p.isFinished)) {
-    setGameState('gameover');
-    return;
-  }
+const passTurn = useCallback(
+  cur => {
+    if (cur.some(p => p.victoryTitle) || cur.every(p => p.isFinished)) {
+      setGameState('gameover');
+      return;
+    }
+    let nextIdx = turnIndex;
+    let count = 0;
+    do {
+      nextIdx = (nextIdx + 1) % cur.length;
+      count++;
+    } while (cur[nextIdx].isFinished && count < cur.length);
 
-  let nextIdx = turnIndex;
-  let count = 0;
-  do {
-    nextIdx = (nextIdx + 1) % cur.length;
-    count++;
-  } while (cur[nextIdx].isFinished && count < cur.length);
-
-  setTurnIndex(nextIdx);
-}, [turnIndex, setGameState, setTurnIndex]);
+    setTurnIndex(nextIdx);
+    setHasProcessedRecoveryThisTurn(false);  // ★ 換人時清旗標
+  },
+  [turnIndex, setGameState, setTurnIndex]
+);
 
 const triggerSocialSubsidy = useCallback(
   (reason = '財力不足') => {
@@ -1944,170 +2166,6 @@ const triggerSocialSubsidy = useCallback(
   ]
 );
 
-  const handleRecoveryAndEvent = useCallback(
-  (playerIndex) => {
-    setPlayers(prev => {
-      const next = [...prev];
-      let finalP = { ...next[playerIndex] };
-      const cell = BOARD_CELLS[finalP.pos];
-
-      // 略過一次落格結算
-      if (finalP.skipCellResolveOnce) {
-        finalP.skipCellResolveOnce = false;
-        next[playerIndex] = finalP;
-        return next;
-      }
-
-      // 先更新各種計數
-      if (cell.type === "work") {
-        if (cell.name === 1) {
-          finalP.work1Count = (finalP.work1Count || 0) + 1;
-
-          // ★ 卷王進度提示：僅在仍有機會追「卷王」時才提示
-          if (canStillPursueGoal(finalP, '卷王')) {
-            notifyGoalProgress(finalP, {
-              current: finalP.work1Count,
-              target: 32,
-              title: "卷王",
-              field25: "kingOfCompetitionNotified25",
-              field50: "kingOfCompetitionNotified50",
-              field75: "kingOfCompetitionNotified75",
-            });
-          }
-        } else if (cell.name === 2) {
-          finalP.work2Count = (finalP.work2Count || 0) + 1;
-        } else if (cell.name === 3) {
-          finalP.work3Count = (finalP.work3Count || 0) + 1;
-        } else if (cell.name === 4) {
-          finalP.work4Count = (finalP.work4Count || 0) + 1;
-        } else if (cell.name === 5) {
-          finalP.work5Count = (finalP.work5Count || 0) + 1;
-
-          // ★ 蛇王進度提示：僅在仍有機會追「蛇王」時才提示
-          if (canStillPursueGoal(finalP, '蛇王')) {
-            notifyGoalProgress(finalP, {
-              current: finalP.work5Count,
-              target: 32,
-              title: "蛇王",
-              field25: "slackOffKingNotified25",
-              field50: "slackOffKingNotified50",
-              field75: "slackOffKingNotified75",
-            });
-          }
-        }
-      }
-
-      const isWork = cell.type === "work";
-      const isHoliday = !!cell.holiday;
-      const cellCost = cell.cost || 0;
-
-      // === 在這裡處理 hasLandedOnWork / hasLandedOnHoliday 的更新邏輯 ===
-      if (isWork) {
-        finalP.hasLandedOnWork = true;
-      }
-
-      if (isHoliday) {
-        // 判斷「最後一圈被截停在起點假日」這個特例
-        const isAtStartHoliday = cell.id === 0;
-        const isLastLap = finalP.lap >= MAX_LAPS;
-
-        const plannedIndex = finalP.lastPlannedStopCellIndex;
-        const plannedCell = plannedIndex != null ? BOARD_CELLS[plannedIndex] : null;
-        const isPlannedWorkCell = plannedCell && plannedCell.type === "work";
-
-        const shouldIgnoreThisStartHoliday =
-          isLastLap && isAtStartHoliday && isPlannedWorkCell;
-
-        // 若是特例，就不要把 hasLandedOnHoliday 設成 true
-        if (!shouldIgnoreThisStartHoliday) {
-          finalP.hasLandedOnHoliday = true;
-        }
-      }
-
-      // === 極端稱號判定 ===
-      if (finalP.isFinished && !finalP.victoryTitle) {
-        const w1 = finalP.work1Count || 0;
-        const w2 = finalP.work2Count || 0;
-        const w3 = finalP.work3Count || 0;
-        const w4 = finalP.work4Count || 0;
-        const w5 = finalP.work5Count || 0;
-
-        // 1. 打工皇帝：整局都沒踩過假日格
-        if (!finalP.hasLandedOnHoliday) {
-          finalP.victoryTitle = "打工皇帝";
-        }
-        // 2. King of Leisure：整局都沒踩過工作日格
-        else if (!finalP.hasLandedOnWork) {
-          finalP.victoryTitle = "King of Leisure";
-        }
-
-        // 2. 卷王
-        const onlyWork1 =
-          w2 === 0 && w3 === 0 && w4 === 0 && w5 === 0 && w1 > 0;
-        if (
-          !finalP.victoryTitle &&
-          onlyWork1 &&
-          w1 >= 32
-        ) {
-          finalP.victoryTitle = "卷王";
-        }
-
-        // 3. 蛇王
-        const onlyWork5 =
-          w1 === 0 && w2 === 0 && w3 === 0 && w4 === 0 && w5 > 0;
-        if (
-          !finalP.victoryTitle &&
-          onlyWork5 &&
-          w5 >= 32
-        ) {
-          finalP.victoryTitle = "蛇王";
-        }
-
-        // 4. 地獄黑仔王
-        const negativeEvents = finalP.negativeEventsCount || 0;
-        const hasPositiveOnWork1 = !!finalP.hasPositiveOnWork1;
-        if (
-          !finalP.victoryTitle &&
-          negativeEvents >= 20 &&
-          !hasPositiveOnWork1 &&
-          (finalP.work1Count || 0) >= 10
-        ) {
-          finalP.victoryTitle = "地獄黑仔王";
-        }
-
-        if (finalP.victoryTitle) {
-          addLog(`${finalP.name} 達成 ${finalP.victoryTitle}`);
-          next[playerIndex] = finalP;
-          setTimeout(() => setGameState("gameover"), 1500);
-          return next;
-        }
-      }
-
-      // 這裡不要再重設 hasLandedOnWork / hasLandedOnHoliday 了
-      // if (isWork) finalP.hasLandedOnWork = true;
-      // if (isHoliday) finalP.hasLandedOnHoliday = true;
-
-      if (isHoliday) {
-        const recover = 10;
-        finalP.stamina = clamp(finalP.stamina + recover, 0, 100);
-        finalP.spirit  = clamp(finalP.spirit + recover, 0, 100);
-        finalP.stress  = clamp(finalP.stress - recover, 0, 100);
-        addLog(`🌴 ${finalP.name} 在假日停歇恢復狀態。`);
-      }
-
-      next[playerIndex] = finalP;
-
-      setTimeout(() => {
-        const ev = drawCard(isWork, cellCost);
-        setActiveEvent({ playerIndex, event: ev, isWork });
-      }, 300);
-
-      return next;
-    });
-  },
-  [setPlayers, drawCard, setActiveEvent, setGameState, addLog, notifyGoalProgress, canStillPursueGoal]
-);
-
   const applyEventEffect = useCallback(() => {
   if (!activeEvent) return;
 
@@ -2455,22 +2513,22 @@ const buildGoalPlanForAI = useCallback(
     // 第 1 層：山大王 + 打工/Leisure + 卷王/蛇王
     const workOrLeisure =
       Math.random() < 0.5
-        ? AI_GOALS.KINGOFWORK
-        : AI_GOALS.KINGOFLEISURE;
+        ? AI_GOALS.KING_OF_WORK
+        : AI_GOALS.KING_OF_LEISURE;
 
     const competitionOrSlack =
       Math.random() < 0.5
-        ? AI_GOALS.KINGOFCOMPETITION
-        : AI_GOALS.SLACKOFFKING;
+        ? AI_GOALS.KING_OF_COMPETITION
+        : AI_GOALS.SLACK_OFF_KING;
 
     plan.push([
-      AI_GOALS.KINGOFCOMPANY,
+      AI_GOALS.KING_OF_COMPANY,
       workOrLeisure,
       competitionOrSlack,
     ]);
 
     // 第 2 層：地獄黑仔王
-    plan.push([AI_GOALS.BADLUCKKING]);
+    plan.push([AI_GOALS.BAD_LUCK_KING]);
 
     // 第 3 層：瘋王 + 邪教上帝（初始先留空，解鎖時再塞進來）
     plan.push([]);
@@ -2649,10 +2707,10 @@ const pickBestItemToUse = useCallback(
     items.forEach((it, itemIdx) => {
       let score = 0;
 
-      // 只處理會卡死的兩個傳送道具：companyhome & longholiday
+      // 專門處理會卡死的兩個傳送道具：companyhome & longholiday
       if ((it.id === 'companyhome' || it.id === 'longholiday') && it.target) {
         const currentPos = ai.pos || 0;
-        const targetPos = getTargetPosition(currentPos, it.target); // 你現成的 helper[file:186]
+        const targetPos = getTargetPosition(currentPos, it.target);
 
         if (targetPos === currentPos) {
           // 已在目標格：這回合完全不考慮用呢張卡
@@ -2660,21 +2718,24 @@ const pickBestItemToUse = useCallback(
         }
       }
 
-      // 如果已經設為 -9999，就唔再計下面的分數
       if (score === -9999) {
-        // do nothing, 留在 -9999
+        // 直接跳過後面所有計分
       } else if (it.id === 'reportall') {
+        // 全體檢舉：針對有股、已解鎖瘋王／邪教的威脅
         const threatCount = players.filter(
           p =>
             p.id !== ai.id &&
+            !p.victoryTitle &&
             (
               (p.items || []).filter(x => x.id === 'companyshare').length >= 3 ||
               p.hasUnlockedMadKing ||
               p.hasUnlockedCultGod
             )
         ).length;
+
         if (threatCount > 0) {
           score = 130 + threatCount * 15;
+
           if (
             aiGoal === AI_GOALS.MAD_KING ||
             aiGoal === AI_GOALS.CULT_GOD ||
@@ -2689,6 +2750,7 @@ const pickBestItemToUse = useCallback(
           }
         }
       } else if (it.id === 'longinvestment') {
+        // 長線投資：愈早用愈好，愈低收益愈要先補
         const perLapIncome = 1000 + (ai.longInvestmentBonus || 0);
         const remainingLapFactor = Math.max(0, 40 - (ai.lap || 0) * 2);
         let baseScore = remainingLapFactor;
@@ -2696,9 +2758,9 @@ const pickBestItemToUse = useCallback(
         if (perLapIncome < 2000) {
           baseScore *= 2.0;
         } else if (perLapIncome < 3000) {
-          baseScore *= 1;
+          baseScore *= 1.5;
         } else {
-          baseScore *= 0;
+          baseScore *= 0.6;
         }
 
         let bonus = 0;
@@ -2714,47 +2776,132 @@ const pickBestItemToUse = useCallback(
 
         score = baseScore + bonus;
       } else if (it.id === 'weed') {
-        if (ai.stress >= 80) {
-          score = 50 + (ai.stress - 80);
-          if (aiGoal === AI_GOALS.MAD_KING && ai.hasUnlockedMadKing) {
-            score += 30;
-          }
+        // 大麻：壓力高／精神低／體力低時優先，瘋王再加權
+        let s = 0;
+
+        if (ai.stress >= 70) {
+          s += 60 + (ai.stress - 70);
         }
+
+        if (ai.spirit <= 40) {
+          s += 40 + (40 - ai.spirit);
+        }
+
+        if (ai.stamina <= 40) {
+          s += 20 + (40 - ai.stamina);
+        }
+
+        if (aiGoal === AI_GOALS.MAD_KING && ai.hasUnlockedMadKing) {
+          s += 40;
+        }
+
+        score = s;
       } else if (it.id === 'donation') {
-        if (ai.hasUnlockedCultGod && ai.belief < 100) {
-          score = 60 + (100 - ai.belief);
-          if (aiGoal === AI_GOALS.CULT_GOD) {
-            score += 25;
-          }
+        // 奉獻：精神低／壓力高／信念低時使用，邪教上帝再加權
+        let s = 0;
+
+        if (ai.spirit <= 50) {
+          s += 40 + (50 - ai.spirit);
         }
+
+        if (ai.stress >= 60) {
+          s += 30 + (ai.stress - 60);
+        }
+
+        if (ai.belief <= 20) {
+          s += 20 + (20 - ai.belief);
+        }
+
+        if (aiGoal === AI_GOALS.CULT_GOD && ai.hasUnlockedCultGod) {
+          s += 40;
+        }
+
+        score = s;
       } else if (it.id === 'toughitout') {
+        // 撐住：中庸自救，壓力高／體力低時用
         if (ai.stamina <= 40 || ai.stress >= 70) {
           score = 40 + (70 - ai.stamina) + Math.max(0, ai.stress - 50);
         }
-     } else if (it.id === 'companyshare') {
-  if (aiGoal === AI_GOALS.KING_OF_COMPANY) {
-    // 山大王目標：絕不能賣出公司股
-    score = -9999;
-  } else {
-    // 其他目標：保留原來的小加成（如果你仍想讓它偶爾賣）
-    score = 15;
-  }
-} else if (it.id === 'workunload' || it.id === 'borrownotreturn') {
-  const threatLevel = evaluateThreatLevel(ai, players);
-  score = threatLevel * 0.8;
-  if (
-    aiGoal === AI_GOALS.KING_OF_COMPANY ||
-    aiGoal === AI_GOALS.MAD_KING ||
-    aiGoal === AI_GOALS.CULT_GOD ||
-    aiGoal === AI_GOALS.KING_OF_COMPETITION ||
-    aiGoal === AI_GOALS.SLACK_OFF_KING ||
-    aiGoal === AI_GOALS.BAD_LUCK_KING ||
-    aiGoal === AI_GOALS.KING_OF_WORK ||
-    aiGoal === AI_GOALS.KING_OF_LEISURE
-  ) {
-    score += 20;
+      } else if (it.id === 'companyshare') {
+        // 公司股：山大王絕不賣，其他目標偶爾賣
+        if (aiGoal === AI_GOALS.KING_OF_COMPANY) {
+          score = -9999;
+        } else {
+          score = 15;
         }
+      } else if (it.id === 'workunload' || it.id === 'borrownotreturn') {
+        // 減壓+害人 or 搶錢：看場上威脅程度
+        const threatLevel = evaluateThreatLevel(ai, players);
+        score = threatLevel * 0.8;
+
+        if (
+          aiGoal === AI_GOALS.KING_OF_COMPANY ||
+          aiGoal === AI_GOALS.MAD_KING ||
+          aiGoal === AI_GOALS.CULT_GOD ||
+          aiGoal === AI_GOALS.KING_OF_COMPETITION ||
+          aiGoal === AI_GOALS.SLACK_OFF_KING ||
+          aiGoal === AI_GOALS.BAD_LUCK_KING ||
+          aiGoal === AI_GOALS.KING_OF_WORK ||
+          aiGoal === AI_GOALS.KING_OF_LEISURE
+        ) {
+          score += 20;
+        }
+      } else if (it.id === 'phonefraud') {
+        // 電話詐騙：優先搶股份，其次搶大富豪的錢
+        let s = 0;
+        const myShares = (ai.items || []).filter(x => x.id === 'companyshare').length;
+
+        let bestTargetShareDiff = 0;
+        let bestTargetWealth = 0;
+
+        players.forEach((p, pIdx) => {
+          if (!p || pIdx === idx || p.victoryTitle) return;
+
+          const otherShares = (p.items || []).filter(x => x.id === 'companyshare').length;
+          const diff = otherShares - myShares;
+
+          if (diff > bestTargetShareDiff) {
+            bestTargetShareDiff = diff;
+          }
+
+          if (otherShares === 0 && p.wealth > bestTargetWealth) {
+            bestTargetWealth = p.wealth;
+          }
+        });
+
+        if (bestTargetShareDiff >= 1) {
+          s += 80 * bestTargetShareDiff;
+        }
+
+        if (bestTargetShareDiff <= 0 && bestTargetWealth >= 1000) {
+          s += 40 + bestTargetWealth * 0.01;
+        }
+
+        if (aiGoal === AI_GOALS.KING_OF_COMPANY) {
+          s += 40;
+        }
+
+        score = s;
+      } else if (it.id === 'blessing') {
+        // 祝福：補信念 buff，特別適合邪教上帝 / 信念低
+        let s = 0;
+
+        if (ai.belief <= 40) {
+          s += 50 + (40 - ai.belief);
+        }
+
+        if (aiGoal === AI_GOALS.CULT_GOD) {
+          s += 30;
+        }
+
+        // 若已經有 blessingBonus 而且未過期，可以適度減少動機
+        if (ai.blessingBonus && (ai.blessingExpireLap || 0) > (ai.lap || 0)) {
+          s *= 0.4;
+        }
+
+        score = s;
       } else if (it.id === 'overtime') {
+        // 加班：給工作系、衰運系偏好
         score = 20;
         if (aiGoal === AI_GOALS.SLACK_OFF_KING) {
           score += 25;
@@ -2762,7 +2909,7 @@ const pickBestItemToUse = useCallback(
           score += 15;
         }
       } else if (it.id === 'companyhome') {
-        // 只有在「不在 firstwork1 目標格」時才會走到這裏
+        // 公司宿舍：幫工作相關／競爭／衰運玩家集中在 work1
         score = 15;
         if (aiGoal === AI_GOALS.KING_OF_COMPETITION) {
           score += 30;
@@ -2772,7 +2919,7 @@ const pickBestItemToUse = useCallback(
           score += 15;
         }
       } else if (it.id === 'shorttrip' || it.id === 'longholiday') {
-        // longholiday 如在 holiday1 目標格會被前面的 teleport 判成 -9999
+        // 旅行：偏向休閒王＆衰運王
         score = 15;
         if (aiGoal === AI_GOALS.KING_OF_LEISURE) {
           score += 25;
@@ -2780,6 +2927,7 @@ const pickBestItemToUse = useCallback(
           score += 8;
         }
       } else if (it.id === 'steakfeast') {
+        // 牛扒宴：純攻擊，給競爭／公司／衰運／摸魚加權
         let base = 30;
         if (
           aiGoal === AI_GOALS.KING_OF_COMPANY ||
@@ -2793,7 +2941,8 @@ const pickBestItemToUse = useCallback(
         }
         score = base;
       } else if (it.id === 'moneyinyourpocket') {
-        score = 1;
+        // 純惡搞扣錢：輕微優先
+        score = 5;
       }
 
       if (score > 0 && (!best || score > best.score)) {
@@ -2993,15 +3142,17 @@ const maybeBuyBeforeAction = useCallback(
 
 const runAI = useCallback(
   (idx) => {
-    const ai = players[idx];
-    if (!ai || !ai.isAI || ai.isFinished) return;
+    const aiRaw = players[idx];
+    if (!aiRaw || !aiRaw.isAI || aiRaw.isFinished) return;
+
+    // 用 snapshot，避免立刻讀到舊 state
+    const ai = { ...aiRaw };
 
     // 1. 先決定本回合要用的長期目標：優先用 currentGoal，不行就從 goalPlan 換一個
     let aiGoal = ai.currentGoal;
 
     if (!aiGoal || !canStillPursueGoalForAI(ai, aiGoal)) {
       const nextGoal = pickNextGoalFromPlan(ai, players);
-      // 這裡用 AI_GOALS 的 key 拿到對應文字（你的 evaluateMoveValue / 其他地方都在用字串）
       aiGoal = nextGoal || AI_GOALS.KING_OF_WORK;
 
       setPlayers(prev => {
@@ -3011,10 +3162,14 @@ const runAI = useCallback(
         next[idx] = p;
         return next;
       });
+
+      // 同步更新 snapshot
+      ai.currentGoal = aiGoal;
     }
 
     // 2. 回合前可能先買卡
-    maybeBuyBeforeAction(ai, aiGoal, idx);
+    const didBuy = maybeBuyBeforeAction(ai, aiGoal, idx);
+    if (didBuy) return; // 👈 新增這行：買完道具先中斷，等 React 更新 state 後 useEffect 會再次喚醒 AI
 
     const updated = players[idx];
     if (!updated || !updated.isAI || updated.isFinished) return;
@@ -3117,9 +3272,12 @@ const runAI = useCallback(
       candidateSteps.add(1);
     }
 
-    // 4.4 用 evaluateMoveValue 對候選步數逐個評分
+    // 4.4 用 evaluateMoveValue 對候選步數逐個評分 + 同層目標保留性
     let bestScore = -Infinity;
     let bestSteps = 1;
+
+    // 先計算「目前第 1 層還有幾個目標是可行的」
+    const beforeCount = countFirstLayerGoalsStillViable(updated, players, {});
 
     for (const s of candidateSteps) {
       let sim = { ...updated };
@@ -3204,6 +3362,43 @@ const runAI = useCallback(
         }
       }
 
+      // ★ 強化版：第 1 層目標保留性加權
+      const simulatedPatch = {};
+
+      if (finalCell.type === 'work') {
+        simulatedPatch.hasLandedOnWork = true;
+
+        if (finalCell.name === '工作日1') {
+          simulatedPatch.work1Count = (updated.work1Count || 0) + 1;
+        } else if (finalCell.name === '工作日2') {
+          simulatedPatch.work2Count = (updated.work2Count || 0) + 1;
+        } else if (finalCell.name === '工作日3') {
+          simulatedPatch.work3Count = (updated.work3Count || 0) + 1;
+        } else if (finalCell.name === '工作日4') {
+          simulatedPatch.work4Count = (updated.work4Count || 0) + 1;
+        } else if (finalCell.name === '工作日5') {
+          simulatedPatch.work5Count = (updated.work5Count || 0) + 1;
+        }
+      }
+
+      if (finalCell.holiday) {
+        simulatedPatch.hasLandedOnHoliday = true;
+      }
+
+      const afterCount = countFirstLayerGoalsStillViable(
+        updated,
+        players,
+        simulatedPatch
+      );
+      const delta = afterCount - beforeCount;
+
+      if (delta < 0) {
+        const basePenalty = 40;
+        const factor = beforeCount || 1;
+        score += delta * basePenalty * factor;
+      }
+
+      // 原本的「走多一步小加成」
       score += 0.15 * s;
 
       if (score > bestScore) {
@@ -3233,6 +3428,7 @@ const runAI = useCallback(
     holidayDeck,
     canStillPursueGoalForAI,
     pickNextGoalFromPlan,
+    countFirstLayerGoalsStillViable,
   ]
 );
 
@@ -3284,17 +3480,12 @@ useEffect(() => {
 // 落格恢復 + 事件流程：由 pendingRecovery 決定要處理哪位玩家
 useEffect(() => {
   if (!pendingRecovery) return;
-  const { playerIndex } = pendingRecovery;
 
-  // move / subsidy 一視同仁，都經過這裡做恢復與事件
-  handleRecoveryAndEvent(playerIndex);
+  runRecoveryOnce(pendingRecovery);
 
-  // 回合實際切換交由 applyEventEffect 的 passTurn 統一處理
+  // 回合實際切換仍由 applyEventEffect / 事件 modal 裡的 passTurn 處理（保持原設計）
   setPendingRecovery(null);
-}, [
-  pendingRecovery,
-  handleRecoveryAndEvent,
-]);
+}, [pendingRecovery, runRecoveryOnce]);
 
  let content;
 
