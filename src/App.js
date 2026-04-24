@@ -801,6 +801,92 @@ const canStillPursueGoalForAI = useCallback(
   [players, canStillPursueGoal]
 );
 
+// === 高威脅玩家偵測：找出快要完成極端目標的大魔王 ===
+const getHighThreatPlayers = useCallback(
+  (playersArg, selfId) => {
+    const result = [];
+
+    playersArg.forEach(p => {
+      if (!p || p.id === selfId || p.victoryTitle) return;
+
+      let threatScore = 0;
+
+      // 1. 股份 >= 4
+      const shareCount = (p.items || []).filter(it => it.id === 'companyshare').length;
+      if (shareCount >= 4) {
+        threatScore += 80 + 10 * (shareCount - 4);
+      }
+
+      // 2. 卷王
+      if (canStillPursueGoal(p, '卷王')) {
+        const w1 = p.work1Count || 0;
+        const progress = w1 / 32;
+        if (progress >= 0.75) {
+          threatScore += 60 + (progress - 0.75) * 40;
+        }
+      }
+
+      // 3. 蛇王
+      if (canStillPursueGoal(p, '蛇王')) {
+        const w5 = p.work5Count || 0;
+        const progress = w5 / 32;
+        if (progress >= 0.75) {
+          threatScore += 60 + (progress - 0.75) * 40;
+        }
+      }
+
+      // 4. 瘋王
+      if (canStillPursueGoal(p, '瘋王')) {
+        const madCount = p.madKingWeedCountAfterUnlock || 0;
+        const progress = madCount / 10;
+        if (progress >= 0.75) {
+          threatScore += 70 + (progress - 0.75) * 50;
+        }
+      }
+
+      // 5. 邪教上帝
+      if (canStillPursueGoal(p, '邪教上帝')) {
+        const donationCount = p.donationUseCount || 0;
+        const progress = donationCount / 10;
+        if (progress >= 0.75) {
+          threatScore += 70 + (progress - 0.75) * 50;
+        }
+      }
+
+      // 6. 地獄黑仔王
+      if (canStillPursueGoal(p, '地獄黑仔王')) {
+        const totalNeg = p.negativeEventsCount || 0;
+        const work1Neg = p.badLuckOnWork1Count || 0;
+        const progressTotal = totalNeg / 20;
+        const progressWork1 = work1Neg / 10;
+        const progress = Math.max(progressTotal, progressWork1);
+        if (progress >= 0.75) {
+          threatScore += 60 + (progress - 0.75) * 40;
+        }
+      }
+
+      // 7. 打工皇帝 / King of Leisure
+      const lap = p.lap || 0;
+      if (lap >= 18) {
+        if (canStillPursueGoal(p, '打工皇帝')) {
+          threatScore += 60;
+        }
+        if (canStillPursueGoal(p, 'King of Leisure')) {
+          threatScore += 60;
+        }
+      }
+
+      if (threatScore > 0) {
+        result.push({ player: p, threatScore, shares: shareCount });
+      }
+    });
+
+    result.sort((a, b) => b.threatScore - a.threatScore);
+    return result;
+  },
+  [canStillPursueGoal]
+);
+
 // ★ 計算「第 1 層目標」在某個狀態下還有多少可行（用於同層保留性）
 const countFirstLayerGoalsStillViable = useCallback(
   (player, allPlayers, simulatedPlayerPatch = {}) => {
@@ -2922,7 +3008,7 @@ const pickBestItemToUse = useCallback(
     const perLapIncome = 1000 + (ai.longInvestmentBonus || 0);
     const isHighWealth = (ai.wealth || 0) >= 3000 && perLapIncome >= 3000;
 
-    // ★ 高財力核心道具表（與你給的表一致）
+    // ★ 高財力核心道具表
     const highWealthCore = {
       [AI_GOALS.KING_OF_COMPANY]: ['phonefraud', 'longholiday'],
       [AI_GOALS.KING_OF_WORK]: ['companyhome', 'steakfeast', 'reportall'],
@@ -2935,9 +3021,8 @@ const pickBestItemToUse = useCallback(
     };
 
     const coreList = highWealthCore[aiGoal] || [];
-    const isHighWealthCore = (id) => isHighWealth && coreList.includes(id);
-    // 高財力核心道具額外加權（第一個核心 > 後面的）
-    const getHighWealthBonus = (id) => {
+    const isHighWealthCore = id => isHighWealth && coreList.includes(id);
+    const getHighWealthBonus = id => {
       if (!isHighWealthCore(id)) return 0;
       const idxCore = coreList.indexOf(id);
       if (idxCore === 0) return 35;
@@ -2945,6 +3030,38 @@ const pickBestItemToUse = useCallback(
       if (idxCore === 2) return 18;
       return 12;
     };
+
+    // ★ 高威脅列表：用來幫攻擊卡鎖目標
+    const highThreatListRaw = getHighThreatPlayers(players, ai.id);
+
+    const pickEffectiveThreatTarget = threatList => {
+      for (const entry of threatList) {
+        const p = entry.player;
+        const shares = (p.items || []).filter(it => it.id === 'companyshare').length;
+        const stamina = p.stamina || 0;
+        const wealth = p.wealth || 0;
+        const score = entry.threatScore || 0;
+
+        const stillThreat =
+          stamina > 0 ||
+          wealth > 0 ||
+          shares >= 3 ||
+          score >= 30;
+
+        const totallyCrippled =
+          stamina === 0 &&
+          wealth <= 0 &&
+          shares <= 2 &&
+          score < 30;
+
+        if (stillThreat && !totallyCrippled) {
+          return p;
+        }
+      }
+      return null;
+    };
+
+    const effectiveThreat = pickEffectiveThreatTarget(highThreatListRaw);
 
     let best = null;
 
@@ -2994,6 +3111,11 @@ const pickBestItemToUse = useCallback(
 
           // 高財力且 reportall 是該目標核心道具之一 → 再加成
           score += getHighWealthBonus(it.id);
+
+          // 若有效目標是已解鎖瘋王 / 邪教的玩家，報串價值再提升
+          if (effectiveThreat && (effectiveThreat.hasUnlockedMadKing || effectiveThreat.hasUnlockedCultGod)) {
+            score += 50;
+          }
         }
       } else if (it.id === 'longinvestment') {
         // 首個自己回合：禁止使用長線投資
@@ -3133,6 +3255,26 @@ const pickBestItemToUse = useCallback(
         ) {
           score += 20;
         }
+
+        // 若有效威脅目標已是低體力 / 低財力，workunload / borrownotreturn 適合作「收割」
+        if (effectiveThreat) {
+          const tStamina = effectiveThreat.stamina || 0;
+          const tWealth = effectiveThreat.wealth || 0;
+          const estBorrowDamage = 1500;
+
+          if (it.id === 'borrownotreturn') {
+            const afterWealth = tWealth - estBorrowDamage;
+            if (afterWealth <= 1000 && tWealth > 0) {
+              score += 35;
+            }
+          }
+
+          if (it.id === 'workunload') {
+            if (tStamina < 50) {
+              score += 25;
+            }
+          }
+        }
       } else if (it.id === 'phonefraud') {
         // 電話詐騙：優先搶股份，其次搶大富豪的錢
         let s = 0;
@@ -3170,6 +3312,14 @@ const pickBestItemToUse = useCallback(
 
         // 高財力核心道具（KING_OF_COMPANY 專屬） → 再加成
         s += getHighWealthBonus(it.id);
+
+        // 若有效目標目前持有股份 >= 4，電話詐騙優先度再提高
+        if (effectiveThreat) {
+          const effShares = (effectiveThreat.items || []).filter(x => x.id === 'companyshare').length;
+          if (effShares >= 4) {
+            s += 60;
+          }
+        }
 
         score = s;
       } else if (it.id === 'blessing') {
@@ -3240,6 +3390,18 @@ const pickBestItemToUse = useCallback(
         } else {
           base += 10;
         }
+
+        // 若有效威脅目標體力偏高，牛扒宴是值得用的大招
+        if (effectiveThreat) {
+          const tStamina = effectiveThreat.stamina || 0;
+          if (tStamina >= 50) {
+            base += 40;
+          } else {
+            // 體力已低 → 不特別鼓勵用牛扒宴，讓其它卡去收割
+            base -= 10;
+          }
+        }
+
         // 高財力 + 核心道具（多條路線都含 steakfeast） → 再加成
         base += getHighWealthBonus(it.id);
 
@@ -3256,7 +3418,107 @@ const pickBestItemToUse = useCallback(
 
     return best;
   },
-  [players, AI_GOALS, evaluateThreatLevel, canStillPursueGoalForAI]
+  [players, AI_GOALS, evaluateThreatLevel, canStillPursueGoalForAI, getHighThreatPlayers]
+);
+
+// === 高威脅模式：根據財力購買攻擊道具（phonefraud / reportall / steakfeast / borrownotreturn / workunload / moneyinyourpocket） ===
+const tryHighThreatBuyAndUse = useCallback(
+  (ai, aiGoal, aiIndex, primaryThreat, highThreatList) => {
+    const wealth = ai.wealth || 0;
+    if (wealth < 2000) return false; // 低於 2000 不啟動高威脅模式
+
+    let mode = null;
+    if (wealth >= 3000) {
+      mode = 'HEAVY';      // 3000+ 價位攻擊
+    } else if (wealth >= 2500) {
+      mode = 'MID';        // 1500～2999 價位攻擊
+    } else {
+      mode = 'REDISTRIBUTE'; // 2000～2499 塞錢入你袋
+    }
+
+    // 2000～2499：對「非高威脅但最有錢」的 AI 用 moneyinyourpocket
+    if (mode === 'REDISTRIBUTE') {
+      let richNonThreat = null;
+      players.forEach(p => {
+        if (!p || p.id === ai.id || p.victoryTitle) return;
+        const isHighThreat = highThreatList.some(t => t.player.id === p.id);
+        if (isHighThreat) return;
+        if (!richNonThreat || p.wealth > richNonThreat.wealth) {
+          richNonThreat = p;
+        }
+      });
+      if (!richNonThreat) return false;
+
+      const moneyItem = AI_ITEM_DATA.find(
+        it => it.id === 'moneyinyourpocket' && wealth - it.price >= 200
+      );
+      if (!moneyItem) return false;
+
+      const realItem = ITEM_DATA.find(x => x.id === moneyItem.id);
+      if (!realItem) return false;
+
+      handleBuyItem(realItem, 1, aiIndex);
+      // 用卡階段交給原本 pickBestItemToUse / handleUseItem，目標自動會偏向有錢但非大魔王
+      return true;
+    }
+
+    // HEAVY / MID：針對 primaryThreat 的攻擊道具
+    const t = primaryThreat;
+    const tShares = (t.items || []).filter(it => it.id === 'companyshare').length;
+    const tStamina = t.stamina || 0;
+    const tWealth = t.wealth || 0;
+
+    const desiredIds = [];
+
+    // 1) 若高威脅玩家股份 >= 4 → 優先電話詐騙
+    if (tShares >= 4) {
+      desiredIds.push('phonefraud');
+    }
+
+    // 2) 若高威脅玩家已解鎖瘋王或邪教 → 優先報串
+    if (t.hasUnlockedMadKing || t.hasUnlockedCultGod) {
+      desiredIds.push('reportall');
+    }
+
+    // 3) 若攻擊後 stamina / wealth 會接近 0 → 傾向扣體力或扣財力的道具
+    const estSteakDamage = 40;    // 你可根據實際數值微調
+    const estBorrowDamage = 1500;
+
+    const afterSta = tStamina - estSteakDamage;
+    const afterWealth = tWealth - estBorrowDamage;
+
+    if (afterSta <= 20 && tStamina > 0) {
+      desiredIds.push('steakfeast');
+    }
+    if (afterWealth <= 1000 && tWealth > 0) {
+      desiredIds.push('borrownotreturn');
+    }
+
+    // 4) 通用攻擊備胎
+    desiredIds.push('workunload');
+
+    // 從 AI_ITEM_DATA 選出符合價位的攻擊卡
+    let candidates = AI_ITEM_DATA.filter(it => desiredIds.includes(it.id));
+
+    if (mode === 'HEAVY') {
+      candidates = candidates.filter(it => it.price >= 3000);
+    } else if (mode === 'MID') {
+      candidates = candidates.filter(it => it.price >= 1500 && it.price < 3000);
+    }
+
+    if (candidates.length === 0) return false;
+
+    const pick = candidates.find(it => wealth - it.price >= 200);
+    if (!pick) return false;
+
+    const real = ITEM_DATA.find(x => x.id === pick.id);
+    if (!real) return false;
+
+    handleBuyItem(real, 1, aiIndex);
+    // 不設定自訂 target，讓 pickBestItemToUse 按原有威脅邏輯決定攻擊誰
+    return true;
+  },
+ [players, handleBuyItem, AI_ITEM_DATA]
 );
 
 // AI 買卡邏輯：只在回合前置階段使用，不結束回合
@@ -3505,7 +3767,7 @@ const tryBuyUsefulItem = useCallback(
           [AI_GOALS.SLACK_OFF_KING]: ['overtime', 'longholiday', 'steakfeast', 'reportall'],
           [AI_GOALS.MAD_KING]: ['weed'],
           [AI_GOALS.CULT_GOD]: ['donation'],
-          [AI_GOALS.BAD_LUCK_KING]: ['companyhome', 'longholiday', 'steakfeast', 'reportall'],
+          [AI_GOALS.BAD_LUCK_KING]: ['longholiday', 'steakfeast', 'reportall'],
         };
 
         const coreList = goalCoreItemsByGoal[aiGoal] || ['longinvestment'];
@@ -3559,7 +3821,7 @@ const tryBuyUsefulItem = useCallback(
     }
 
     // 1) 體力過低：把補體力道具推到最前
-    const isStaminaLow = stamina < 35;
+    const isStaminaLow = stamina < 30;
     if (isStaminaLow) {
       const front = [];
       const rest = [];
@@ -3603,8 +3865,8 @@ const tryBuyUsefulItem = useCallback(
       dynamicOrder = [...front, ...rest];
     }
 
-    // 3.5) 財力不足 4000 時，盡量不買攻擊道具
-    const isWealthLowForAttack = ai.wealth < 4000;
+    // 3.5) 財力不足 3500 時，盡量不買攻擊道具
+    const isWealthLowForAttack = ai.wealth < 3500;
     let filteredAffordable = [...affordable];
     if (isWealthLowForAttack) {
       filteredAffordable = filteredAffordable.filter(
@@ -3658,11 +3920,21 @@ const tryBuyUsefulItem = useCallback(
 
 const maybeBuyBeforeAction = useCallback(
   (ai, aiGoal, aiIndex) => {
+    // 1) 先檢查場上是否有「快要完成目標」的大魔王
+    const highThreatList = getHighThreatPlayers(players, ai.id);
+    const primaryThreat = highThreatList[0]?.player || null;
+
+    if (primaryThreat && (ai.wealth || 0) >= 2000) {
+      const didThreatAction = tryHighThreatBuyAndUse(ai, aiGoal, aiIndex, primaryThreat, highThreatList);
+      if (didThreatAction) return true;
+    }
+
+    // 2) 若沒有高威脅或財力不足，走原本購物邏輯
     const buyScore = evaluateBuyValue(ai, aiGoal);
     if (buyScore <= 0) return false;
     return tryBuyUsefulItem(ai, aiGoal, aiIndex);
   },
-  [evaluateBuyValue, tryBuyUsefulItem]
+  [players, evaluateBuyValue, tryBuyUsefulItem, getHighThreatPlayers, tryHighThreatBuyAndUse]
 );
 
 // ==================== AI 回合主控 ====================
@@ -3949,31 +4221,38 @@ const runAI = useCallback(
       }
 
       // 地獄黑仔王：若落腳在 cost=5 的格子，且該牌堆負面比例高，就加權
-      if (needBadLuckFocus && finalCost === 5) {
-        let negativeRatio = 0;
+if (needBadLuckFocus && finalCost === 5) {
+  let negativeRatio = 0;
 
-        if (finalCell.type === 'work') {
-          const total = workDeck.length;
-          if (total > 0) {
-            const negCount = workDeck.filter(card =>
-              WORK_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
-            ).length;
-            negativeRatio = negCount / total;
-          }
-        } else if (finalCell.holiday) {
-          const total = holidayDeck.length;
-          if (total > 0) {
-            const negCount = holidayDeck.filter(card =>
-              HOLIDAY_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
-            ).length;
-            negativeRatio = negCount / total;
-          }
-        }
+  if (finalCell.type === 'work') {
+    const total = workDeck.length;
+    if (total > 0) {
+      const negCount = workDeck.filter(card =>
+        WORK_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
+      ).length;
+      negativeRatio = negCount / total;
+    }
+  } else if (finalCell.holiday) {
+    const total = holidayDeck.length;
+    if (total > 0) {
+      const negCount = holidayDeck.filter(card =>
+        HOLIDAY_NEGATIVE_EVENTS.some(ev => ev.id === card.id)
+      ).length;
+      negativeRatio = negCount / total;
+    }
+  }
 
-        if (negativeRatio >= 0.5) {
-          score += 50 * negativeRatio;
-        }
-      }
+  if (negativeRatio >= 0.5) {
+    score += 50 * negativeRatio;
+  }
+
+  // ★ 新增：在工作日1已經抽過 10 次負面事件後，避免再主動踩 cost=5
+  const negWork1Count = ai.badLuckOnWork1Count || 0;
+  if (negWork1Count >= 10) {
+    // 這裡直接給 cost=5 一個明顯的扣分
+    score -= 100;
+  }
+}
 
       // combo 其他目標保護
       const simulatedPatch = {};
