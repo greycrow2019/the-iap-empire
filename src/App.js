@@ -113,7 +113,7 @@ const HOLIDAY_NEGATIVE_EVENTS = [
 const ITEM_DATA = [
   {
     id: 'overtime',
-    title: '<連續通宵趕project>',
+    title: '<連續通宵>',
     price: 500,
     desc: '使用後直接移至下一個工作日5。',
     imageUrl: process.env.PUBLIC_URL + '/picture/overtime.png',
@@ -137,7 +137,7 @@ const ITEM_DATA = [
   },
   {
     id: 'longholiday',
-    title: '<長假享受人生>',
+    title: '<悠長假期>',
     price: 1000,
     desc: '使用後直接傳送至假日1。若已在此位置則無法使用。',
     imageUrl: process.env.PUBLIC_URL + '/picture/longholiday.png',
@@ -1483,7 +1483,7 @@ if (itemToUse.target) {
 
         if (willFinishByThisJump) {
           addLog(
-            `⏰ ${p.name} 使用「連續通宵趕project」，從最後一個工作日5 衝過起點到下一個工作日5，完成最後一圈 +$1000${
+            `⏰ ${p.name} 使用「連續通宵」，從最後一個工作日5 衝過起點到下一個工作日5，完成最後一圈 +$1000${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ""
@@ -1491,7 +1491,7 @@ if (itemToUse.target) {
           );
         } else {
           addLog(
-            `⏰ ${p.name} 使用「連續通宵趕project」，從工作日5 跨過起點到下一個工作日5，+1圈 +$1000${
+            `⏰ ${p.name} 使用「連續通宵」，從工作日5 跨過起點到下一個工作日5，+1圈 +$1000${
               p.longInvestmentBonus > 0
                 ? `（長線投資 +${p.longInvestmentBonus}）`
                 : ""
@@ -1501,7 +1501,7 @@ if (itemToUse.target) {
       }
     }
 
-    // 長假享受人生：傳送到假日1，並視為過起點 → 一定 +1圈 + 每圈收入 + 長線投資收益
+    // 悠長假期：傳送到假日1，並視為過起點 → 一定 +1圈 + 每圈收入 + 長線投資收益
     if (itemToUse.target === "holiday1" && fromPos !== 0) {
       p.lap += 1;
       p.wealth = clamp(p.wealth + 1000, 0, 10000);
@@ -1525,7 +1525,7 @@ if (itemToUse.target) {
       }
 
       addLog(
-        `🏖️ ${p.name} 使用「長假享受人生」，傳送至假日1 並獲得 +1圈 + $1000${
+        `🏖️ ${p.name} 使用「悠長假期」，傳送至假日1 並獲得 +1圈 + $1000${
           p.longInvestmentBonus > 0
             ? `（長線投資 +${p.longInvestmentBonus}）`
             : ""
