@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/the-iap-empire/static/css/main.77f6be6f.css",
-    "main.js": "/the-iap-empire/static/js/main.1d661641.js",
+    "main.js": "/the-iap-empire/static/js/main.ab02f494.js",
     "static/js/453.7a98b697.chunk.js": "/the-iap-empire/static/js/453.7a98b697.chunk.js",
     "index.html": "/the-iap-empire/index.html",
     "main.77f6be6f.css.map": "/the-iap-empire/static/css/main.77f6be6f.css.map",
-    "main.1d661641.js.map": "/the-iap-empire/static/js/main.1d661641.js.map",
+    "main.ab02f494.js.map": "/the-iap-empire/static/js/main.ab02f494.js.map",
     "453.7a98b697.chunk.js.map": "/the-iap-empire/static/js/453.7a98b697.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.77f6be6f.css",
-    "static/js/main.1d661641.js"
+    "static/js/main.ab02f494.js"
   ]
 }
