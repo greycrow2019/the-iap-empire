@@ -481,29 +481,43 @@ const handlePickTargetCell = useCallback(
   }, [addLog]);
 
   const proceedToNaming = (humans, ais) => {
-    const initialPlayers = [];
-    let colorIdx = 0;
-    for (let i = 0; i < humans; i++) {
-      initialPlayers.push({
-        id: `p${i}`,
-        name: `玩家 ${i + 1}`,
-        isAI: false,
-        color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
-        shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length],
-      });
-    }
-    for (let i = 0; i < ais; i++) {
-      initialPlayers.push({
-        id: `ai${i}`,
-        name: `AI ${i + 1}`,
-        isAI: true,
-        color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
-        shape: PLAYER_SHAPES[colorIdx++ % PLAYER_SHAPES.length],
-      });
-    }
-    setPlayers(initialPlayers);
-    setGameState('naming');
-  };
+  const initialPlayers = [];
+  let colorIdx = 0;
+
+  // 建人類玩家
+  for (let i = 0; i < humans; i++) {
+    initialPlayers.push({
+      id: `p${i}`,
+      name: `玩家${i + 1}`,
+      isAI: false,
+      color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
+      shape: PLAYER_SHAPES[colorIdx % PLAYER_SHAPES.length],
+    });
+    colorIdx++;
+  }
+
+  // 建 AI 玩家
+  for (let i = 0; i < ais; i++) {
+    initialPlayers.push({
+      id: `ai${i}`,
+      name: `AI ${i + 1}`,
+      isAI: true,
+      color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
+      shape: PLAYER_SHAPES[colorIdx % PLAYER_SHAPES.length],
+    });
+    colorIdx++;
+  }
+
+  setPlayers(initialPlayers);
+
+  if (humans === 0) {
+    // ★ 全 AI 局：直接跳過命名畫面
+    finalizeStart();
+  } else {
+    // 有人類玩家 → 進入命名畫面
+    setGameState("naming");
+  }
+};
 
   const finalizeStart = () => {
   setPlayers(prev =>
