@@ -6019,7 +6019,13 @@ useEffect(() => {
 
 // 2) log 自動捲到底
 
-useEffect(() => logEndRef.current?.scrollIntoView({ behavior: 'smooth' }), [logs]);
+useEffect(() => {
+  const el = logEndRef.current;
+  if (el && typeof el.scrollIntoView === "function") {
+    el.scrollIntoView({ behavior: "smooth" });
+  }
+  // 不要 return 任何值；需要清理時才 return () => { ... }
+}, [logs]);
 
 // 當輪到 AI 且沒有移動 / 事件 / 抽牌時，自動在 1.2 秒後啟動 AI 回合
 useEffect(() => {
